@@ -1,6 +1,5 @@
 # PiMon
-Designed for Mississippi State University's IEEE SECON Robotics team  
-in Software Engineer Senior Project 2019.
+Designed for Mississippi State University IEEE SECON Robotics team in Software Engineer Senior Project 2019.
 
 ## Authors
 Spencer Barnes, Jake Griesmer,
