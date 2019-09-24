@@ -1,0 +1,53 @@
+{% extends "root.jinja2" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-body">
+      <!-- console display -->
+      <label class="h4 card-title" for="out_display">Output</label>
+      <textarea id="out_display" class="form-control bg-dark text-light border-white" disabled rows="15"></textarea>
+
+      <!-- console toolbar -->
+      <div class="btn-toolbar mt-2" role="toolbar">
+        <!-- auto scroll button -->
+        <div class="col-auto ml-auto px-0">
+          <button id="in_autoScroll" type="button" data-toggle="button" class="btn btn-outline-primary active">
+            Auto Scroll
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script>
+    $(function () {
+      // select page objects
+      const $outDisplay = $('#out_display');
+      const $inAutoScroll = $('#in_autoScroll');
+
+      // connect to stream
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', '{{ url_for('console_stream') }}');
+      xhr.send();
+
+      // update display, with delay
+      (function update() {
+        // update text
+        $outDisplay.text(xhr.responseText);
+        // scroll to bottom
+        if ($inAutoScroll.hasClass('active')) {
+          $outDisplay.scrollTop($outDisplay[0].scrollHeight);
+        }
+        // schedule update, if not done
+        if (xhr.readyState !== XMLHttpRequest.DONE) {
+          setTimeout(update, 250)
+        }
+      })();
+    });
+  </script>
+{% endblock %}
