@@ -1,5 +1,5 @@
 # PiMon
-Designed for Mississippi State University IEEE SECON Robotics team in Software Engineer Senior Project 2019.
+Designed for Mississippi State University IEEE SECON Robotics team in Software Engineer Senior Project 2019.  
 Provides a web interface to view robot diagnostics data.
 
 ## Authors
