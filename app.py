@@ -1,3 +1,4 @@
+import os
 import time
 
 from flask import Flask, render_template, Response
@@ -13,7 +14,8 @@ scss = Bundle('site.scss', filters='libsass', output='site.css')
 assets.register('scss_all', scss)
 
 # open log file for display
-input_log = open('_std.log')
+LOG_FILE_NAME = "_std.log"
+log_file = None
 
 
 @app.route('/')
@@ -25,15 +27,31 @@ def home():
 @app.route("/stream/console")
 def console_stream():
     """Stream: continuous stream of pipeline"""
+    # log_file is global
+    global log_file
+
+    # if the log_file has not been opened
+    if log_file is None:
+        try:
+            # try to open LOG_FILE_NAME
+            log_file = open(LOG_FILE_NAME)
+        except FileNotFoundError:
+            # something went wrong
+            return Response(f"could not open {LOG_FILE_NAME}")
 
     def stream():
         # go to last line of file
-        input_log.seek(0, 2)
+        log_file.seek(0, 2)
+        # loop indefinitely
         while True:
-            line = input_log.readline()
+            # read a line
+            line = log_file.readline()
+            # if line didn't exist
             if not line:
+                # wait
                 time.sleep(0.1)
                 continue
+            # yield the line
             yield line
 
     return Response(stream(), mimetype='text/html')
