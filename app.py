@@ -36,7 +36,7 @@ def console_stream():
             log_file = open(LOG_FILE_NAME)
         except FileNotFoundError:
             # something went wrong
-            return Response(f"could not open {LOG_FILE_NAME}")
+            return Response("could not open log")
 
     def stream():
         # go to last line of file
@@ -58,4 +58,4 @@ def console_stream():
 
 # if main process, run the Flask app
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
