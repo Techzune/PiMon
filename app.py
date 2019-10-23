@@ -1,7 +1,17 @@
 import time
+import threading
 
 from flask import Flask, render_template, Response
 from flask_assets import Environment, Bundle
+
+#DEBUG THREAD: populates log file
+def sensorDataDebug():
+    for x in range(1, 10000):
+        logFile = open(LOG_FILE_NAME, "a")
+        logFile.write("This is a test: "+str(x)+"\n")
+        logFile.close()
+        time.sleep(0.2)
+#DEBUG THREAD /
 
 # create Flask application
 app = Flask(__name__)
@@ -16,6 +26,11 @@ assets.register('scss_all', scss)
 LOG_FILE_NAME = "_std.log"
 log_file = None
 
+#DEBUG THREAD: start
+sensorDataDebugThread = threading.Thread(target=sensorDataDebug)
+sensorDataDebugThread.daemon = True
+sensorDataDebugThread.start()
+#DEBUG THREAD /
 
 @app.route('/')
 def home():
