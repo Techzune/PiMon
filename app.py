@@ -1,4 +1,7 @@
 import time
+import threading
+import test
+import sys
 
 from flask import Flask, render_template, Response
 from flask_assets import Environment, Bundle
@@ -16,6 +19,12 @@ assets.register('scss_all', scss)
 LOG_FILE_NAME = "_std.log"
 log_file = None
 
+#DEBUG THREAD: start
+if (sys.argv.__contains__("test")):
+    sensorDataDebugThread = threading.Thread(target=test.populateLogFileTester, args=(LOG_FILE_NAME,))
+    sensorDataDebugThread.daemon = True
+    sensorDataDebugThread.start()
+#DEBUG THREAD /
 
 @app.route('/')
 def home():
