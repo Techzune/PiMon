@@ -40,7 +40,7 @@ def console_stream():
             log_file = open(LOG_FILE_NAME)
         except FileNotFoundError:
             # something went wrong
-            return Response("could not open log")
+            return Response("Nothing to show.")
 
     def stream():
         # go to last line of file
