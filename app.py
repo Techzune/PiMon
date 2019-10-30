@@ -1,8 +1,9 @@
+import os
 import time
 from sys import argv
 from threading import Thread
 
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, send_from_directory
 from flask_assets import Environment, Bundle
 
 import test
@@ -19,6 +20,12 @@ assets.register('scss_all', scss)
 # open log file for display
 LOG_FILE_NAME = "_std.log"
 log_file = None
+
+
+# route to favicon
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico')
 
 
 @app.route('/')
