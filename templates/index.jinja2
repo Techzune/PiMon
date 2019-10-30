@@ -4,20 +4,39 @@
 
 {% block content %}
 
-  <div class="card">
-    <div class="card-body">
-      <!-- dashboard -->
-      <h4 class="card-title">Dashboard</h4>
-      <p class="card-text text-muted">
-        Nothing to show.
-      </p>
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="card">
+        <div class="card-header">
+          Integers
+        </div>
+        <div class="card-body">
+          <p class="card-text text-muted">
+            Nothing to show.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 mt-4 mt-sm-0">
+      <div class="card">
+        <div class="card-header">
+          Strings
+        </div>
+        <div class="card-body">
+          <p class="card-text text-muted">
+            Nothing to show.
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="card mt-3">
+  <div class="card mt-4">
+    <div class="card-header">
+      <label class="mb-0" for="out_display">Log</label>
+    </div>
     <div class="card-body">
       <!-- console display -->
-      <label class="h4 card-title" for="out_display">Log</label>
       <textarea id="out_display" class="form-control bg-dark text-light border-white" disabled rows="15"></textarea>
 
       <!-- console toolbar -->
