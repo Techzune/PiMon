@@ -7,25 +7,27 @@
   <div class="row">
     <div class="col-sm-6">
       <div class="card">
-        <div class="card-header">
-          Integers
-        </div>
-        <div class="card-body">
-          <p class="card-text text-muted">
-            Nothing to show.
-          </p>
+        <div class="card">
+          <div class="card-header">
+            <label class="mb-0" for="int_display">Integers</label>
+          </div>
+          <div class="card-body">
+            <!-- integer display -->
+            <textarea id="int_display" class="form-control bg-dark text-light border-white"
+                      disabled rows="10"></textarea>
+          </div>
         </div>
       </div>
     </div>
     <div class="col-sm-6 mt-4 mt-sm-0">
       <div class="card">
         <div class="card-header">
-          Strings
+          <label class="mb-0" for="str_display">Strings</label>
         </div>
         <div class="card-body">
-          <p class="card-text text-muted">
-            Nothing to show.
-          </p>
+          <!-- string display -->
+          <textarea id="str_display" class="form-control bg-dark text-light border-white"
+                    disabled rows="10"></textarea>
         </div>
       </div>
     </div>
@@ -37,7 +39,8 @@
     </div>
     <div class="card-body">
       <!-- console display -->
-      <textarea id="out_display" class="form-control bg-dark text-light border-white" disabled rows="15"></textarea>
+      <textarea id="out_display" class="form-control bg-dark text-light border-white"
+                disabled rows="15"></textarea>
 
       <!-- console toolbar -->
       <div class="btn-toolbar mt-2" role="toolbar">
@@ -73,6 +76,42 @@
         if ($inAutoScroll.hasClass('active')) {
           $outDisplay.scrollTop($outDisplay[0].scrollHeight);
         }
+        // schedule update, if not done
+        if (xhr.readyState !== XMLHttpRequest.DONE) {
+          setTimeout(update, 250)
+        }
+      })();
+    });
+
+    $(function() {
+      const $strDisplay = $('#str_display');
+      // connect to stream
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', '{{ url_for('console_stream') }}');
+      xhr.send();
+
+      // update display, with delay
+      (function update() {
+        // update text
+        $strDisplay.text(xhr.responseText);
+        // schedule update, if not done
+        if (xhr.readyState !== XMLHttpRequest.DONE) {
+          setTimeout(update, 250)
+        }
+      })();
+    });
+
+    $(function() {
+      const $intDisplay = $('#int_display');
+      // connect to stream
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', '{{ url_for('console_stream') }}');
+      xhr.send();
+
+      // update display, with delay
+      (function update() {
+        // update text
+        $intDisplay.text(xhr.responseText);
         // schedule update, if not done
         if (xhr.readyState !== XMLHttpRequest.DONE) {
           setTimeout(update, 250)
