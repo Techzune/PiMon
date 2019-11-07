@@ -7,15 +7,13 @@
   <div class="row">
     <div class="col-sm-6">
       <div class="card">
-        <div class="card">
-          <div class="card-header">
-            <label class="mb-0" for="int_display">Integers</label>
-          </div>
-          <div class="card-body">
-            <!-- integer display -->
-            <textarea id="int_display" class="form-control bg-dark text-light border-white"
-                      disabled rows="10"></textarea>
-          </div>
+        <div class="card-header">
+          <label class="mb-0" for="int_display">Integers</label>
+        </div>
+        <div class="card-body">
+          <!-- integer display -->
+          <textarea id="int_display" class="form-control bg-dark text-light border-white"
+                    disabled rows="10"></textarea>
         </div>
       </div>
     </div>
@@ -83,7 +81,7 @@
       })();
     });
 
-    $(function() {
+    $(function () {
       const $strDisplay = $('#str_display');
       // connect to stream
       const xhr = new XMLHttpRequest();
@@ -101,7 +99,7 @@
       })();
     });
 
-    $(function() {
+    $(function () {
       const $intDisplay = $('#int_display');
       // connect to stream
       const xhr = new XMLHttpRequest();
