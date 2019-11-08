@@ -1,0 +1,7 @@
+{
+    "board": "arduino:avr:uno",
+    "sketch": "Sensor_Input\\Sensor_Input.ino",
+    "port": "COM7",
+    "programmer": "AVR ISP",
+    "output": "../build"
+}
