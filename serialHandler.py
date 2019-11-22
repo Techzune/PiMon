@@ -6,11 +6,11 @@ import serial
 PORT_NAME = "/dev/ttyACM0"
 
 
-def serialReader(portName, queue):
+def serialReader(portName, red):
     port = serial.Serial(portName, 115200)
     while True:
         readSerial = port.readline().decode('utf-8')
-        queue.put(readSerial)
+        red.publish('msg', readSerial)
         sleep(0.05)
 
 

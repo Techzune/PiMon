@@ -6,7 +6,7 @@ from flask import Flask, render_template, Response, send_from_directory, request
 from flask_assets import Environment, Bundle
 
 
-def create_app(queue):
+def create_app(red):
     # use error as stdout
     sys.stdout = sys.stderr
 
@@ -40,8 +40,11 @@ def create_app(queue):
 
         """
         def events():
-            while True:
-                yield queue.get()
+            pubsub = red.pubsub()
+            pubsub.subscribe('msg')
+            for message in pubsub.listen():
+                print(message)
+                yield message
         return Response(events(), content_type='text/event-stream')
 
     return app
