@@ -1,12 +1,15 @@
 from threading import Thread
 from time import sleep
 
+import redis
 import serial
 
 PORT_NAME = "/dev/ttyACM0"
 
+red = redis.Redis(host='localhost', port=6379, db=0)
 
-def serialReader(portName, red):
+
+def serialReader(portName):
     port = serial.Serial(portName, 115200)
     while True:
         readSerial = port.readline().decode('utf-8')

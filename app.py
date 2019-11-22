@@ -2,11 +2,14 @@ import os
 import sys
 import time
 
-from flask import Flask, render_template, Response, send_from_directory, request
+import redis
+from flask import Flask, render_template, Response, send_from_directory
 from flask_assets import Environment, Bundle
 
+red = redis.Redis(host='localhost', port=6379, db=0)
 
-def create_app(red):
+
+def create_app():
     # use error as stdout
     sys.stdout = sys.stderr
 
@@ -39,9 +42,11 @@ def create_app(red):
         See ./templates/index.jinja2 for Javascript code.
 
         """
+
         def events():
             time.sleep(0.5)
             yield red.get('msg')
+
         return Response(events(), mimetype='text/html')
 
     return app
