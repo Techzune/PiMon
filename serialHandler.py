@@ -26,6 +26,6 @@ def triggerSensorData(portName):
         sleep(0.2)
 
 
-def setupSerialHandlers(queue):
-    Thread(target=serialReader, args=(PORT_NAME, queue), daemon=True).start()
+def setupSerialHandlers():
+    Thread(target=serialReader, args=(PORT_NAME,), daemon=True).start()
     triggerSensorData(PORT_NAME)
