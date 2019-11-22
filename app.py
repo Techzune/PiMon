@@ -39,7 +39,9 @@ def create_app(queue):
 
         """
         def stream():
-            yield queue.get()
+            msg = queue.get()
+            queue.task_done()
+            yield msg
 
         return Response(stream(), mimetype='text/html')
 
