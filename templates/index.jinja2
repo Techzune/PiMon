@@ -112,7 +112,8 @@
 
         // schedule update, if not done
         if (xhr.readyState !== XMLHttpRequest.DONE) {
-          setTimeout(update, 250);
+          console.log('refresh')
+          setTimeout(update, 1000);
         }
 
       })();
