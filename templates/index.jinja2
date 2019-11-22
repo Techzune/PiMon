@@ -67,51 +67,57 @@
       const xhr = new XMLHttpRequest();
       xhr.open('GET', '{{ url_for('console_stream') }}');
       xhr.send();
+      let position = 0;
 
       // update display, with delay
       function update() {
-        // clear the displays
-        $intDisplay.val('');
-        $boolDisplay.val('');
+        let messages = xhr.responseText.split('\n');
+        messages.slice(position, -1).forEach(function (value) {
+          // clear the displays
+          $intDisplay.val('');
+          $boolDisplay.val('');
 
-        console.log(xhr.response);
+          console.log(value);
 
-        // split the sensor data by semicolon
-        const sensorData = xhr.response.split(';');
+          // split the sensor data by semicolon
+          const sensorData = value.split(';');
 
-        // iterate through sensor data
-        sensorData.forEach(function (dataString) {
+          // iterate through sensor data
+          sensorData.forEach(function (dataString) {
 
-          // split sensor data by comma
-          const data = dataString.split(',');
+            // split sensor data by comma
+            const data = dataString.split(',');
 
-          // is this actual data? (should have 4 values)
-          if (data.length > 3) {
+            // is this actual data? (should have 4 values)
+            if (data.length > 3) {
 
-            if (data[1] === 'num') {
-              // number data
-              $intDisplay.append(data[0] + ': ' + data[2] + ' ' + data[3] + '<br/>');
+              if (data[1] === 'num') {
+                // number data
+                $intDisplay.append(data[0] + ': ' + data[2] + ' ' + data[3] + '<br/>');
 
-            } else if (data[1] === 'bool') {
-              // boolean data
-              $boolDisplay.append(data[0] + ': ' + data[2] + ' ' + data[3] + '<br/>');
+              } else if (data[1] === 'bool') {
+                // boolean data
+                $boolDisplay.append(data[0] + ': ' + data[2] + ' ' + data[3] + '<br/>');
+
+              } else {
+                // wtf data
+                $outDisplay.append(data[0] + ': ' + data[2] + ' ' + data[3] + '<br/>');
+                if ($inAutoScroll.hasClass('active')) {
+                  $outDisplay.scrollTop($outDisplay[0].scrollHeight);
+                }
+              }
 
             } else {
-              // wtf data
-              $outDisplay.append(data[0] + ': ' + data[2] + ' ' + data[3] + '<br/>');
-              if ($inAutoScroll.hasClass('active')) {
-                $outDisplay.scrollTop($outDisplay[0].scrollHeight);
-              }
+              // wasn't actual data, just output string
+              $outDisplay.append(dataString);
+              $outDisplay.append('<br/>');
+
             }
-
-          } else {
-            // wasn't actual data, just output string
-            $outDisplay.append(dataString);
-            $outDisplay.append('<br/>');
-
-          }
+          });
         });
+        position = messages.length - 1;
       }
+
       setInterval(function () {
         // update the displays
         update();
