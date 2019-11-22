@@ -38,6 +38,7 @@ def create_app(queue):
 
     # create Flask application
     app = Flask(__name__)
+    app.app_context().push()
     app.register_blueprint(main)
 
     # render SCSS
