@@ -1,5 +1,4 @@
 import os
-import time
 from multiprocessing import Queue
 
 from flask import Flask, render_template, Response, send_from_directory
@@ -19,7 +18,10 @@ LOG_FILE_NAME = "/home/pi/PiMon/_std.log"
 log_file = None
 
 if 'queue' not in globals():
+    print("Queue NOT found!")
     queue = Queue()
+else:
+    print("Queue found!")
 
 # route to favicon
 @app.route('/favicon.ico')
