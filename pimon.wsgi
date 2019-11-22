@@ -11,7 +11,7 @@ sys.path.append('/home/pi/PiMon')
 # run the serial handler in a separate process :)
 import serialHandler
 from multiprocessing import Process
-s_handler_process = Process(target=serialHandler.setupSerialHandlers, args=(LOG_FILE_NAME,))
+s_handler_process = Process(target=serialHandler.setupSerialHandlers, args=('_std.log',))
 s_handler_process.start()
 
 from app import app as application
