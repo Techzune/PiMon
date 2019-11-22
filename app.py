@@ -42,6 +42,6 @@ def create_app(red):
         def events():
             time.sleep(0.5)
             yield red.get('msg')
-        return Response(events(), content_type='text/event-stream')
+        return Response(events(), mimetype='text/html')
 
     return app
