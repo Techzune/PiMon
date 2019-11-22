@@ -71,8 +71,8 @@
       // update display, with delay
       (function update() {
         // clear the displays
-        $intDisplay.text('');
-        $boolDisplay.text('');
+        $intDisplay.val('');
+        $boolDisplay.val('');
 
         // split the sensor data by semicolon
         const sensorData = xhr.responseText.split(';');
