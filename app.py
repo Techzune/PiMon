@@ -1,11 +1,8 @@
 import os
 import time
-from multiprocessing import Process
 
 from flask import Flask, render_template, Response, send_from_directory
 from flask_assets import Environment, Bundle
-
-import serialHandler
 
 # create Flask application
 app = Flask(__name__)
@@ -69,10 +66,6 @@ def console_stream():
 
     return Response(stream(), mimetype='text/html')
 
-
-# run the serial handler in a separate process :)
-s_handler_process = Process(target=serialHandler.setupSerialHandlers, args=(LOG_FILE_NAME,))
-s_handler_process.start()
 
 # if main process, run the Flask app
 if __name__ == '__main__':
