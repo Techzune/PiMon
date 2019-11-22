@@ -11,11 +11,11 @@ if 'q' not in globals():
 
 
 def serialReader(portName, logFileName):
+    global q
     port = serial.Serial(portName, 115200)
     while True:
         readSerial = port.readline().decode('utf-8')
         q.put(readSerial)
-
         sleep(0.05)
 
 

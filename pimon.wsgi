@@ -8,6 +8,9 @@ logging.basicConfig(stream=sys.stderr)
 sys.path.append('/home/pi/.local/share/virtualenvs/PiMon-KQG44wUy/lib/python3.5/site-packages')
 sys.path.append('/home/pi/PiMon')
 
+from multiprocessing import Queue
+q = Queue()
+
 # run the serial handler in a separate process :)
 import serialHandler
 from multiprocessing import Process
