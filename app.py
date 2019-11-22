@@ -18,6 +18,8 @@ def create_app(queue):
     assets.url = app.static_url_path
     assets.register('scss_all', scss)
 
+    last_msg = ""
+
     # app.config['queue'] = queue
     # app.app_context().push()
 
@@ -40,8 +42,11 @@ def create_app(queue):
         """
 
         def stream():
+            global last_msg
             while True:
-                yield queue.get()
+                if not queue.empty():
+                    last_msg = queue.get()
+                yield last_msg
 
         return Response(stream(), mimetype='text/html')
 
