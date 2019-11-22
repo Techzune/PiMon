@@ -38,10 +38,9 @@ def create_app(queue):
         See ./templates/index.jinja2 for Javascript code.
 
         """
+
         def stream():
-            msg = queue.get()
-            queue.task_done()
-            yield msg
+            yield queue.get()
 
         return Response(stream(), mimetype='text/html')
 
