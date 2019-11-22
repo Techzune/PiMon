@@ -6,7 +6,6 @@ from threading import Thread
 from flask import Flask, render_template, Response, send_from_directory
 from flask_assets import Environment, Bundle
 
-import test
 import serialHandler
 
 # create Flask application
@@ -70,13 +69,6 @@ def console_stream():
 
 # if main process, run the Flask app
 if __name__ == '__main__':
-    # test mode starts a thread for log
-    if 'test' in argv:
-        sensor_debug_thread = Thread(target=test.populateLogFileTester,
-                                     args=(LOG_FILE_NAME,))
-        sensor_debug_thread.daemon = True
-        sensor_debug_thread.start()
-
     serialHandler.setupSerialHandlers(LOG_FILE_NAME);
     # run app on 0.0.0.0 to accept all connections
     app.run(host='0.0.0.0')
