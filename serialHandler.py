@@ -6,7 +6,7 @@ import serial
 
 PORT_NAME = "/dev/ttyACM0"
 
-red = redis.Redis(host='localhost', port=6379, db=0)
+red = redis.StrictRedis()
 
 
 def serialReader(portName):

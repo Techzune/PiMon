@@ -6,7 +6,7 @@ import redis
 from flask import Flask, render_template, Response, send_from_directory
 from flask_assets import Environment, Bundle
 
-red = redis.Redis(host='localhost', port=6379, db=0)
+red = redis.StrictRedis()
 
 
 def create_app():
