@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 
 from flask import Flask, render_template, Response, send_from_directory
 from flask_assets import Environment, Bundle
@@ -17,8 +18,6 @@ def create_app(queue):
     assets = Environment(app)
     assets.url = app.static_url_path
     assets.register('scss_all', scss)
-
-    last_msg = ""
 
     # app.config['queue'] = queue
     # app.app_context().push()
@@ -42,12 +41,8 @@ def create_app(queue):
         """
 
         def stream():
-            global last_msg
             while True:
-                if not queue.empty():
-                    last_msg = queue.get()
-                print(last_msg)
-                yield last_msg
+                yield queue.get()
 
         return Response(stream(), mimetype='text/html')
 
