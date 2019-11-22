@@ -17,4 +17,5 @@ from multiprocessing import Process
 s_handler_process = Process(target=serialHandler.setupSerialHandlers, args=(queue,))
 s_handler_process.start()
 
-from app import app as application
+from app import create_app
+create_app(queue)

@@ -2,30 +2,8 @@ import os
 import sys
 from multiprocessing import Queue
 
-from flask import Flask, render_template, Response, send_from_directory
+from flask import Flask, render_template, Response, send_from_directory, current_app
 from flask_assets import Environment, Bundle
-
-# use error as stdout
-sys.stdout = sys.stderr
-
-# create Flask application
-app = Flask(__name__)
-
-# render SCSS
-scss = Bundle('site.scss', filters='libsass', output='site.css')
-assets = Environment(app)
-assets.url = app.static_url_path
-assets.register('scss_all', scss)
-
-# open log file for display
-LOG_FILE_NAME = "/home/pi/PiMon/_std.log"
-log_file = None
-
-if 'queue' not in globals():
-    print("Queue NOT found!")
-    queue = Queue()
-else:
-    print("Queue found!")
 
 # route to favicon
 @app.route('/favicon.ico')
@@ -47,13 +25,24 @@ def console_stream():
 
     """
     def stream():
-        global queue
+        queue = current_app.config['queue']
         yield queue.get()
 
     return Response(stream(), mimetype='text/html')
 
 
-# if main process, run the Flask app
-if __name__ == '__main__':
-    # run app on 0.0.0.0 to accept all connections
-    app.run(host='0.0.0.0')
+def create_app(queue):
+    # use error as stdout
+    sys.stdout = sys.stderr
+
+    # create Flask application
+    app = Flask(__name__)
+
+    # render SCSS
+    scss = Bundle('site.scss', filters='libsass', output='site.css')
+    assets = Environment(app)
+    assets.url = app.static_url_path
+    assets.register('scss_all', scss)
+
+    app.config['queue'] = queue
+    return app
