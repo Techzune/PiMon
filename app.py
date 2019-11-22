@@ -2,7 +2,7 @@ import os
 import sys
 import time
 
-from flask import Flask, render_template, Response, send_from_directory
+from flask import Flask, render_template, Response, send_from_directory, request
 from flask_assets import Environment, Bundle
 
 
@@ -39,13 +39,11 @@ def create_app(queue):
         See ./templates/index.jinja2 for Javascript code.
 
         """
-
-        def stream():
-            while True:
-                text = queue.get()
-                print(text)
-                yield text
-
-        return Response(stream(), mimetype='text/html')
+        if request.headers.get('accept') == 'text/event-stream':
+            def events():
+                while True:
+                    yield queue.get()
+            return Response(events(), content_type='text/event-stream')
+        return None
 
     return app

@@ -11,7 +11,7 @@ def serialReader(portName, queue):
     while True:
         readSerial = port.readline().decode('utf-8')
         queue.put(readSerial)
-        sleep(1)
+        sleep(0.05)
 
 
 def triggerSensorData(portName):
