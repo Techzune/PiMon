@@ -40,5 +40,3 @@ def setupSerialHandlers(logFileName):
     #Process(target=serialReader, args=(PORT_NAME,logFileName), daemon=True).start()
     #Thread(target=triggerSensorData, args=(PORT_NAME,), daemon=True).start()
     triggerSensorData(PORT_NAME);
-
-setupSerialHandlers("_std.log");
