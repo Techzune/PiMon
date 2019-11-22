@@ -40,11 +40,8 @@ def create_app(red):
 
         """
         def events():
-            pubsub = red.pubsub()
-            pubsub.subscribe('msg')
-            for message in pubsub.listen():
-                print(message)
-                yield message
+            time.sleep(0.5)
+            yield red.get('msg')
         return Response(events(), content_type='text/event-stream')
 
     return app

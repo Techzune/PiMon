@@ -10,7 +10,7 @@ def serialReader(portName, red):
     port = serial.Serial(portName, 115200)
     while True:
         readSerial = port.readline().decode('utf-8')
-        red.publish('msg', readSerial)
+        red.set('msg', readSerial)
         sleep(0.05)
 
 

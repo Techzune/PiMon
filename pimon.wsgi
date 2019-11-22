@@ -9,8 +9,7 @@ sys.path.append('/home/pi/.local/share/virtualenvs/PiMon-KQG44wUy/lib/python3.5/
 sys.path.append('/home/pi/PiMon')
 
 import redis
-red = redis.StrictRedis()
-
+red = redis.Redis(host='localhost', port=6379, db=0)
 
 # run the serial handler in a separate process :)
 import serialHandler
