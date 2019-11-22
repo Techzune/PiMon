@@ -73,7 +73,6 @@ def console_stream():
 # run the serial handler in a separate process :)
 s_handler_process = Process(target=serialHandler.setupSerialHandlers, args=(LOG_FILE_NAME,))
 s_handler_process.start()
-s_handler_process.join()
 
 # if main process, run the Flask app
 if __name__ == '__main__':
