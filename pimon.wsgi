@@ -9,12 +9,12 @@ sys.path.append('/home/pi/.local/share/virtualenvs/PiMon-KQG44wUy/lib/python3.5/
 sys.path.append('/home/pi/PiMon')
 
 from multiprocessing import Queue
-q = Queue()
+queue = Queue()
 
 # run the serial handler in a separate process :)
 import serialHandler
 from multiprocessing import Process
-s_handler_process = Process(target=serialHandler.setupSerialHandlers, args=('_std.log',))
+s_handler_process = Process(target=serialHandler.setupSerialHandlers, args=('_std.log', queue))
 s_handler_process.start()
 
 from app import app as application

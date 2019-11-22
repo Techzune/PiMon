@@ -18,8 +18,8 @@ assets.register('scss_all', scss)
 LOG_FILE_NAME = "/home/pi/PiMon/_std.log"
 log_file = None
 
-if 'q' not in globals():
-    q = Queue()
+if 'queue' not in globals():
+    queue = Queue()
 
 # route to favicon
 @app.route('/favicon.ico')
@@ -41,8 +41,8 @@ def console_stream():
 
     """
     def stream():
-        global q
-        yield q.get()
+        global queue
+        yield queue.get()
 
     return Response(stream(), mimetype='text/html')
 
