@@ -36,7 +36,11 @@ def home():
 
 @app.route("/stream/console")
 def console_stream():
-    """Stream: continuous stream of pipeline"""
+    """Stream: continuous pipeline stream
+    This stream is connected to by client via Javascript to constantly download messages (Responses) from the server.
+    See ./templates/index.jinja2 for Javascript code.
+
+    """
     # log_file is global
     global log_file
 
