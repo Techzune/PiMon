@@ -72,8 +72,8 @@
       (function update() {
         const sensorData = xhr.responseText.split(';');
         sensorData.forEach(function (dataString) {
-          try {
-            const data = dataString.split(',');
+          const data = dataString.split(',');
+          if (dataString.length > 3) {
             if (data[1] === 'num') {
               $intDisplay.append(data[0] + ': ' + data[2] + ' ' + data[3] + '<br/>');
 
@@ -86,7 +86,7 @@
                 $outDisplay.scrollTop($outDisplay[0].scrollHeight);
               }
             }
-          } catch (error) {
+          } else {
             $outDisplay.append(dataString);
             $outDisplay.append('<br/>')
           }
