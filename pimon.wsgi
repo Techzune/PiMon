@@ -18,4 +18,4 @@ s_handler_process = Process(target=serialHandler.setupSerialHandlers, args=(queu
 s_handler_process.start()
 
 from app import create_app
-create_app(queue)
+app = create_app(queue)
