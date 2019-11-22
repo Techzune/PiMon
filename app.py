@@ -18,7 +18,7 @@ assets.url = app.static_url_path
 assets.register('scss_all', scss)
 
 # open log file for display
-LOG_FILE_NAME = "_std.log"
+LOG_FILE_NAME = "/home/pi/PiMon/_std.log"
 log_file = None
 
 
