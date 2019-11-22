@@ -27,7 +27,7 @@ def setupSerialHandlers(queue):
     i = 0
     while True:
         i = i + 1
-        queue.put('HELLO ' + i)
+        queue.put('HELLO ' + str(i))
         sleep(0.1)
 
     Thread(target=serialReader, args=(PORT_NAME, queue), daemon=True).start()
