@@ -6,6 +6,8 @@ import redis
 from flask import Flask, render_template, Response, send_from_directory
 from flask_assets import Environment, Bundle
 
+red = redis.StrictRedis()
+
 def create_app():
     # use error as stdout
     sys.stdout = sys.stderr
@@ -41,10 +43,9 @@ def create_app():
         """
 
         def events():
-            red = redis.StrictRedis()
-            time.sleep(0.5)
             yield red.get('msg')
+            time.sleep(.25)
 
-        return Response(events(), mimetype='text/html')
+        return Response(events(), mimetype='text/plain')
 
     return app

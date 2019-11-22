@@ -109,14 +109,9 @@
 
           }
         });
-        const timer = setInterval(function() {
+        setInterval(function() {
           // update the displays
           update();
-          // stop checking once the response has ended
-          if (xhr.readyState === XMLHttpRequest.DONE) {
-            clearInterval(timer);
-            $outDisplay.append('Done');
-          }
         }, 250);
       })();
     });
