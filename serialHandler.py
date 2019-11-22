@@ -34,7 +34,7 @@ def limitFileSize(logFile, sizeLimit=32768):  # 32 KB
     if os.path.getsize(logFileName) >= sizeLimit:
         logFile.close()
         os.replace(logFileName, logFileName + ".old")
-        logFile = open(logFileName, "a+")
+        logFile = open(logFileName, os.O_NONBLOCK | os.O_APPEND | os.O_CREAT)
     return logFile
 
 

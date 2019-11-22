@@ -44,7 +44,7 @@ def console_stream():
     if log_file is None:
         try:
             # try to open LOG_FILE_NAME
-            log_file = open(LOG_FILE_NAME)
+            log_file = open(LOG_FILE_NAME, os.O_NONBLOCK)
         except FileNotFoundError:
             # something went wrong
             return Response("Nothing to show.")
