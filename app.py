@@ -45,7 +45,7 @@ def create_app(queue):
             global last_msg
             while True:
                 if not queue.empty():
-                    last_msg = queue.get()
+                    last_msg = queue.get(block=False)
                 yield last_msg
 
         return Response(stream(), mimetype='text/html')
