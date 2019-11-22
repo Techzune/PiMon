@@ -63,16 +63,19 @@
       const $boolDisplay = $('#bool_display');
       const $intDisplay = $('#int_display');
 
-      const source = new EventSource('{{  url_for('console_stream') }}');
-      source.onmessage = function (e) {
+      // connect to stream
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', '{{ url_for('console_stream') }}');
+      xhr.send();
+
+      // update display, with delay
+      (function update() {
         // clear the displays
         $intDisplay.text('');
         $boolDisplay.text('');
 
-        console.log(e.data);
-
         // split the sensor data by semicolon
-        const sensorData = e.data.split(';');
+        const sensorData = xhr.responseText.split(';');
 
         // iterate through sensor data
         sensorData.forEach(function (dataString) {
@@ -106,7 +109,13 @@
 
           }
         });
-      }
+
+        // schedule update, if not done
+        if (xhr.readyState !== XMLHttpRequest.DONE) {
+          setTimeout(update, 250);
+        }
+
+      })();
     });
   </script>
 {% endblock %}
