@@ -39,11 +39,9 @@ def create_app(queue):
         See ./templates/index.jinja2 for Javascript code.
 
         """
-        if request.headers.get('accept') == 'text/event-stream':
-            def events():
-                while True:
-                    yield queue.get()
-            return Response(events(), content_type='text/event-stream')
-        return None
+        def events():
+            while True:
+                yield queue.get()
+        return Response(events(), content_type='text/event-stream')
 
     return app
