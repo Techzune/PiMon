@@ -74,10 +74,10 @@
         $intDisplay.val('');
         $boolDisplay.val('');
 
-        console.log(xhr.responseText);
+        console.log(xhr.response);
 
         // split the sensor data by semicolon
-        const sensorData = xhr.responseText.split(';');
+        const sensorData = xhr.response.split(';');
 
         // iterate through sensor data
         sensorData.forEach(function (dataString) {
