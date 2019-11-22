@@ -26,9 +26,9 @@ def console_stream():
 
     """
     def stream():
-        queue = current_app.config['queue']
-        yield queue.get()
-
+        with current_app.app_context:
+            queue = current_app.config['queue']
+            yield queue.get()
     return Response(stream(), mimetype='text/html')
 
 
