@@ -1,8 +1,12 @@
 import os
+import sys
 from multiprocessing import Queue
 
 from flask import Flask, render_template, Response, send_from_directory
 from flask_assets import Environment, Bundle
+
+# use error as stdout
+sys.stdout = sys.stderr
 
 # create Flask application
 app = Flask(__name__)
