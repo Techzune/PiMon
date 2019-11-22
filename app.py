@@ -1,5 +1,6 @@
 import os
 import time
+from multiprocessing import Queue
 
 from flask import Flask, render_template, Response, send_from_directory
 from flask_assets import Environment, Bundle
@@ -17,6 +18,8 @@ assets.register('scss_all', scss)
 LOG_FILE_NAME = "/home/pi/PiMon/_std.log"
 log_file = None
 
+if 'q' not in globals():
+    q = Queue()
 
 # route to favicon
 @app.route('/favicon.ico')
@@ -37,32 +40,9 @@ def console_stream():
     See ./templates/index.jinja2 for Javascript code.
 
     """
-    # log_file is global
-    global log_file
-
-    # if the log_file has not been opened
-    if log_file is None:
-        try:
-            # try to open LOG_FILE_NAME
-            log_file = open(LOG_FILE_NAME, os.O_NONBLOCK)
-        except FileNotFoundError:
-            # something went wrong
-            return Response("Nothing to show.")
-
     def stream():
-        # go to last line of file
-        log_file.seek(0, 2)
-        # loop indefinitely
-        while True:
-            # read a line
-            line = log_file.readline()
-            # if line didn't exist
-            if not line:
-                # wait
-                time.sleep(0.1)
-                continue
-            # yield the line
-            yield line
+        global q
+        yield q.get()
 
     return Response(stream(), mimetype='text/html')
 

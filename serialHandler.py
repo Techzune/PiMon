@@ -1,4 +1,4 @@
-import os
+from multiprocessing import Queue
 from threading import Thread
 from time import sleep
 
@@ -6,16 +6,15 @@ import serial
 
 PORT_NAME = "/dev/ttyACM0"
 
+if 'q' not in globals():
+    q = Queue()
+
 
 def serialReader(portName, logFileName):
     port = serial.Serial(portName, 115200)
-    logFile = open(logFileName, "a+")
     while True:
         readSerial = port.readline().decode('utf-8')
-        logFile.writelines(readSerial)
-        logFile.flush()
-
-        logFile = limitFileSize(logFile)
+        q.put(readSerial)
 
         sleep(0.05)
 
@@ -27,15 +26,6 @@ def triggerSensorData(portName):
     while True:
         port.write(command)
         sleep(0.2)
-
-
-def limitFileSize(logFile, sizeLimit=32768):  # 32 KB
-    logFileName = logFile.name
-    if os.path.getsize(logFileName) >= sizeLimit:
-        logFile.close()
-        os.replace(logFileName, logFileName + ".old")
-        logFile = open(logFileName, os.O_NONBLOCK | os.O_APPEND | os.O_CREAT)
-    return logFile
 
 
 def setupSerialHandlers(logFileName):
