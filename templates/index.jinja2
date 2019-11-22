@@ -74,6 +74,8 @@
         $intDisplay.empty();
         $boolDisplay.empty();
 
+        console.log(xhr.responseText);
+
         // split the sensor data by semicolon
         const sensorData = xhr.responseText.split(';');
 

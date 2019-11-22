@@ -42,7 +42,9 @@ def create_app(queue):
 
         def stream():
             while True:
-                yield queue.get()
+                text = queue.get()
+                print(text)
+                yield text
 
         return Response(stream(), mimetype='text/html')
 
