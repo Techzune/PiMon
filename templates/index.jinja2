@@ -70,31 +70,49 @@
 
       // update display, with delay
       (function update() {
+        // clear the displays
+        $intDisplay.text('');
+        $boolDisplay.text('');
+
+        // split the sensor data by semicolon
         const sensorData = xhr.responseText.split(';');
+
+        // iterate through sensor data
         sensorData.forEach(function (dataString) {
+
+          // split sensor data by comma
           const data = dataString.split(',');
+
+          // is this actual data? (should have 4 values)
           if (data.length > 3) {
+
             if (data[1] === 'num') {
+              // number data
               $intDisplay.append(data[0] + ': ' + data[2] + ' ' + data[3] + '<br/>');
 
             } else if (data[1] === 'bool') {
+              // boolean data
               $boolDisplay.append(data[0] + ': ' + data[2] + ' ' + data[3] + '<br/>');
 
             } else {
+              // wtf data
               $outDisplay.append(data[0] + ': ' + data[2] + ' ' + data[3] + '<br/>');
               if ($inAutoScroll.hasClass('active')) {
                 $outDisplay.scrollTop($outDisplay[0].scrollHeight);
               }
             }
+
           } else {
+            // wasn't actual data, just output string
             $outDisplay.append(dataString);
-            $outDisplay.append('<br/>')
+            $outDisplay.append('<br/>');
+
           }
         });
 
         // schedule update, if not done
         if (xhr.readyState !== XMLHttpRequest.DONE) {
-          setTimeout(update, 250)
+          setTimeout(update, 250);
         }
 
       })();
