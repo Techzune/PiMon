@@ -40,7 +40,8 @@ def create_app(queue):
         """
 
         def stream():
-            yield queue.get()
+            while True:
+                yield queue.get()
 
         return Response(stream(), mimetype='text/html')
 
