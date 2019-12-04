@@ -93,25 +93,23 @@
 
               if (data[1] === 'num') {
                 // number data
-                $intDisplay.append(data[0] + ': ' + data[2] + ' ' + data[3] + '<br/>');
+                $intDisplay.val($intDisplay.val() + data[0] + ': ' + data[2] + ' ' + data[3] + '\n');
 
               } else if (data[1] === 'bool') {
                 // boolean data
-                $boolDisplay.append(data[0] + ': ' + data[2] + ' ' + data[3] + '<br/>');
+                $boolDisplay.val($boolDisplay.val() + data[0] + ': ' + data[2] + ' ' + data[3] + '\n');
 
               } else {
                 // wtf data
-                $outDisplay.append(data[0] + ': ' + data[2] + ' ' + data[3] + '<br/>');
+                $outDisplay.val($outDisplay.val() +data[0] + ': ' + data[2] + ' ' + data[3] + '<br/>');
                 if ($inAutoScroll.hasClass('active')) {
                   $outDisplay.scrollTop($outDisplay[0].scrollHeight);
                 }
               }
 
-            } else {
+            } else if (data.length > 0) {
               // wasn't actual data, just output string
-              $outDisplay.append(dataString);
-              $outDisplay.append('<br/>');
-
+              $outDisplay.val($outDisplay.val() + dataString + '\n');
             }
           });
         });
