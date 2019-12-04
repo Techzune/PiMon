@@ -29,4 +29,4 @@ def triggerSensorData(portName):
 
 def setupSerialHandlers():
     Thread(target=serialReader, args=(PORT_NAME,), daemon=True).start()
-    triggerSensorData(PORT_NAME)
+    Thread(target=triggerSensorData, args=(PORT_NAME,), daemon=True).start()

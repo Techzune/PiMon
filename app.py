@@ -6,6 +6,9 @@ import redis
 from flask import Flask, render_template, Response, send_from_directory
 from flask_assets import Environment, Bundle
 
+# import function to start reading/writing from serial port
+from serialHandler import setupSerialHandlers
+
 red = redis.StrictRedis()
 
 def create_app():
@@ -20,6 +23,9 @@ def create_app():
     assets = Environment(app)
     assets.url = app.static_url_path
     assets.register('scss_all', scss)
+
+    # initialize serialHandlers
+    setupSerialHandlers()
 
     # app.config['queue'] = queue
     # app.app_context().push()
