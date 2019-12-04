@@ -55,6 +55,12 @@ String getSensorData()
   // LIMITSWITCH1
   output = output + getLimitSwitchData("limitSwitch1", LIMITSWITCH1);
 
+  //DEBUG PLEASE REMOVE
+  output = output + "sonar2,num,11.5,in;Front Sonar,num,1.34,feet;";
+  if (digitalRead(LIMITSWITCH1) == HIGH)
+  {
+    output = output + "debug.senors,str,This is some test code-ignore me,str;";
+  }
   return output;
 }
 
@@ -75,7 +81,7 @@ void serialEvent()
   // reply if desired
   if (outgoing != "")
   {
-    Serial.print(outgoing);
+    Serial.print(outgoing + "\n");
     outgoing = "";
   }
   incoming = "";
