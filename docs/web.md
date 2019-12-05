@@ -7,11 +7,7 @@ PiMon is developed with the following libraries:
 * Python + Flask
 
 ## What are *.jinja2 files?
-In a nutshell, they're fancy HTML files via templates.  
+In a nutshell, they're fancy HTML files via templates.
 You can write HTML code like normal. However, jinja2 allows you to
 write basic Python statements and use "blocks" to template off
 sections.
-
-```
-blah blah blah blurgh
-```
