@@ -15,7 +15,7 @@ def serialReader(portName):
         readSerial = port.readline().decode('utf-8')
         red.set('msg', readSerial)
         print(readSerial)
-        sleep(0.05)
+        sleep(0.1)
 
 
 def triggerSensorData(portName):

@@ -70,10 +70,12 @@
       let position = 0;
 
       // update outDisplay with character limit
-      function updateOutDisplay(newText, limit = 2048)
-      {
+      function updateOutDisplay(newText, limit = 2048) {
         let currentText = $outDisplay.val();
-        $outDisplay.val(currentText.substring(currentText.length-limit) + newText);
+        $outDisplay.val(currentText.substring(currentText.length - limit) + newText);
+
+        if ($inAutoScroll.hasClass('active'))
+          $outDisplay.scrollTop($outDisplay[0].scrollHeight);
       }
 
       // update display, with delay
@@ -84,17 +86,12 @@
           $intDisplay.val('');
           $boolDisplay.val('');
 
-          console.log(value);
-
           // split the sensor data by semicolon
           const sensorData = value.split(';');
 
           // iterate through sensor data
           sensorData.forEach(function (dataString) {
-            if (dataString == "")
-            {
-              return;
-            }
+            if (dataString === "") return;
 
             // split sensor data by comma
             const data = dataString.split(',');
@@ -113,9 +110,6 @@
               } else {
                 // wtf data
                 updateOutDisplay(data[0] + ': ' + data[2] + ' ' + data[3] + '\n');
-                if ($inAutoScroll.hasClass('active')) {
-                  $outDisplay.scrollTop($outDisplay[0].scrollHeight);
-                }
               }
 
             } else if (data.length > 0) {
@@ -130,7 +124,7 @@
       setInterval(function () {
         // update the displays
         update();
-      }, 400);
+      }, 250);
     });
   </script>
 {% endblock %}

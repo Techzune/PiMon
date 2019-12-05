@@ -11,6 +11,7 @@ from serialHandler import setupSerialHandlers
 
 red = redis.StrictRedis()
 
+
 def create_app():
     # use error as stdout
     sys.stdout = sys.stderr
@@ -26,9 +27,6 @@ def create_app():
 
     # initialize serialHandlers
     setupSerialHandlers()
-
-    # app.config['queue'] = queue
-    # app.app_context().push()
 
     # route to favicon
     @app.route('/favicon.ico')
