@@ -14,19 +14,31 @@ To install Pipenv, run `pip3 install pipenv`.
 Clone this repository into a folder of your choosing and run
 `pipenv install`. This will install all necessary packages for this project.
 
+*This app will need to run as **root** to get port 80 access!*
+
+You may run into issues with `libsass` and `pipenv`. To fix this,
+enter your development folder and run `sudo pipenv shell`. Then,
+type `pipenv install libsass`. This bypasses `pipenv` but fixes the bug.
+
 
 ## Development
 PiMon is developed with the following:
 * Python 3.7 + pipenv
 * Bootstrap 4.3.1 + Bootswatch (Darkly)
 * Flask
-* Apache2 + modWSGI
+* Waitress
 
 You may need C++ Build Tools to install all packages.
 
 ## Usage
-#### Running via WSGI
-Configure your web server to launch the application via pimon.wsgi.
-PiMon was developed with Apache2.
+PiMon runs on a Waitress server.
 
-[Click here for more information via modWSGI's wiki.](https://modwsgi.readthedocs.io/en/develop/user-guides/quick-configuration-guide.html)
+Run the app my executing the following command in the dev folder:
+```
+sudo pipenv run python app.py
+```
+or
+```
+sudo pipenv shell
+python app.py
+```
