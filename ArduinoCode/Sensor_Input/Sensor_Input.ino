@@ -28,16 +28,16 @@ void loop()
     // Start going up
     dummyDataDirection = true;
   }
-  else if (dummyData >= 32768)
+  else if (dummyData >= 16000)
   {
     // Start going down
     dummyDataDirection = false;
   }
 
   if (dummyDataDirection)
-    dummyData += 1;
+    dummyData = dummyData + 1;
   else
-    dummyData -= 1;
+    dummyData = dummyData - 1;
 }
 
 // Generic data extractions and unit for each category of sensor
@@ -74,7 +74,7 @@ String getSensorData()
   // LIMITSWITCH1
   output = output + getLimitSwitchData("limitSwitch1", LIMITSWITCH1);
 
-  output = output + "dummyData,num,"+dummyData+",dummy;"
+  output = output + "dummyData,num,"+dummyData+",dummy;";
 
   //DEBUG PLEASE REMOVE
   output = output + "sonar2,num,11.5,in;Front Sonar,num,1.34,feet;";
