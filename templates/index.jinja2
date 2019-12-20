@@ -112,9 +112,33 @@
                 updateOutDisplay(data[0] + ': ' + data[2] + ' ' + data[3] + '\n');
               }
 
-            } else if (data.length > 0) {
+            }
+            else if (data.length > 0) {
+              
+              if (data[0] == "time") {
+                let alive = true;
+
+                sentTime = data[1].split(':');
+                recievedTime = [getHours(),getMinutes(),getSeconds()];
+
+                for (i = 0, len = recievedTime.length; i < len; i++) {
+                  if (recievedTime[i] - sentTime[i] > 1)
+                    alive = false;
+                  
+                }
+
+                if (alive == true) {
+                  updateOutDisplay("alive\n");
+                }
+                else {
+                  updateOutDisplay("dead\n");
+                }
+              }
               // wasn't actual data, just output string
-              updateOutDisplay(dataString + '\n');
+              else {
+                updateOutDisplay(dataString + '\n');
+              }
+
             }
           });
         });

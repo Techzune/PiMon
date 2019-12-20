@@ -48,7 +48,7 @@ def create_app():
 
         def events():
             while True:
-                yield red.get('msg')
+                yield "time,"+red.get('msg')
                 time.sleep(.25)
 
         return Response(events(), mimetype='text/plain')
