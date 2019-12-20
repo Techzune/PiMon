@@ -5,7 +5,9 @@
 }
 
 .alive {
-    animation: beat 0.4s linear 0 infinite alternate;
+    animation: beat 1s linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
 }
 
 @keyframes beat {
@@ -13,6 +15,6 @@
         transform: scale(1);
     }
     to {
-        transform: scale(1.5);
+        transform: scale(2);
     }
 }
