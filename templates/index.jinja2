@@ -78,6 +78,21 @@
           $outDisplay.scrollTop($outDisplay[0].scrollHeight);
       }
 
+      function checkHeartBeat(sentTime) {
+        sentTime = sentTime.split(':');
+        sentTime = (sentTime[0]*3600)+(sentTime[1]*60)+sentTime[2];
+
+        let dateObj = new Date();
+        let recievedTime = (dateObj.getHours()*3600)+(dateObj.getMinutes()*60)+dateObj.getSeconds();
+
+        if (recievedTime - sentTime < 2) {
+          updateOutDisplay("alive\n");
+        }
+        else {
+          updateOutDisplay("dead\n");
+        }
+      }
+
       // update display, with delay
       function update() {
         let messages = xhr.responseText.split('\n');
@@ -116,23 +131,7 @@
             else if (data.length > 0) {
               
               if (data[0] == "time") {
-                let alive = true;
-
-                sentTime = data[1].split(':');
-                recievedTime = [getHours(),getMinutes(),getSeconds()];
-
-                for (i = 0, len = recievedTime.length; i < len; i++) {
-                  if (recievedTime[i] - sentTime[i] > 1)
-                    alive = false;
-                  
-                }
-
-                if (alive == true) {
-                  updateOutDisplay("alive\n");
-                }
-                else {
-                  updateOutDisplay("dead\n");
-                }
+                
               }
               // wasn't actual data, just output string
               else {
