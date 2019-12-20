@@ -1,5 +1,5 @@
 from threading import Thread
-from time import sleep
+from time import sleep, strftime
 
 import redis
 import serial
@@ -13,8 +13,8 @@ def serialReader(portName):
     port = serial.Serial(portName, 115200)
     while True:
         readSerial = port.readline().decode('utf-8')
-        red.set('msg', readSerial)
-        # print(readSerial)
+        red.set('msg', strftime("%H:%M:%S;")+readSerial)
+        
         sleep(0.1)
 
 

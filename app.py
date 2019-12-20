@@ -48,11 +48,7 @@ def create_app():
 
         def events():
             while True:
-                idling = red.object('idletime', 'msg')
-                if idling >= 3:
-                    yield None
-                else:
-                    yield red.get('msg')
+                yield red.get('msg')
                 time.sleep(.25)
 
         return Response(events(), mimetype='text/plain')
