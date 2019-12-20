@@ -81,6 +81,8 @@ String getSensorData()
   if (dummyData%3 == 0)
   {
     output = output + "debug.senors,str,This is some test code: "+dummyData+",str;";
+    // DEBUG oh god this is terrible, pleeeease remove
+    delay(2000);
   }
 
   return output;
