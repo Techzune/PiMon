@@ -78,19 +78,14 @@
           $outDisplay.scrollTop($outDisplay[0].scrollHeight);
       }
 
-      function checkHeartBeat(sentTime) {
+      function connectionAlive(sentTime, deltaSeconds = 1) {
         sentTime = sentTime.split(':');
         sentTime = (sentTime[0]*3600)+(sentTime[1]*60)+Number(sentTime[2]);
 
         let dateObj = new Date();
         let recievedTime = (dateObj.getHours()*3600)+(dateObj.getMinutes()*60)+dateObj.getSeconds();
 
-        if (recievedTime - sentTime < 2) {
-          updateOutDisplay("alive\n");
-        }
-        else {
-          updateOutDisplay("dead\n");
-        }
+        return recievedTime - sentTime < deltaSeconds;
       }
 
       // update display, with delay
@@ -107,8 +102,11 @@
           // First element should be time stamp
           let data = sensorData[0].split(',');
           let sentTime = data[1];
-          if (data[0] == "time") {
-            checkHeartBeat(sentTime);
+
+          // Dead connection
+          if (data[0] == "time" && !connectionAlive(sentTime)) {
+            console.log("dead\n");
+            return;
           }
 
           // iterate through sensor data
@@ -117,6 +115,9 @@
 
             // split sensor data by comma
             const data = dataString.split(',');
+
+            // Skip time stamp data
+            if (data[0] == "time") return;
 
             // is this actual data? (should have 4 values)
             if (data.length > 3) {
