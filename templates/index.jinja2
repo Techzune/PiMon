@@ -80,7 +80,7 @@
 
       function checkHeartBeat(sentTime) {
         sentTime = sentTime.split(':');
-        sentTime = (sentTime[0]*3600)+(sentTime[1]*60)+sentTime[2];
+        sentTime = (sentTime[0]*3600)+(sentTime[1]*60)+int(sentTime[2]);
 
         let dateObj = new Date();
         let recievedTime = (dateObj.getHours()*3600)+(dateObj.getMinutes()*60)+dateObj.getSeconds();
@@ -124,7 +124,7 @@
 
               } else {
                 // wtf data
-                updateOutDisplay(data[0] + ': ' + data[2] + ' ' + data[3] + '\n');
+                updateOutDisplay(data[0] + ': ' + data[2] + '\n');
               }
 
             }
