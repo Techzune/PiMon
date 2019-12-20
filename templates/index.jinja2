@@ -92,9 +92,6 @@
       function update() {
         let messages = xhr.responseText.split('\n');
         messages.slice(position, -1).forEach(function (value) {
-          // clear the displays
-          $intDisplay.val('');
-          $boolDisplay.val('');
 
           // split the sensor data by semicolon
           const sensorData = value.split(';');
@@ -108,6 +105,10 @@
             console.log("dead\n");
             return;
           }
+
+          // clear the displays
+          $intDisplay.val('');
+          $boolDisplay.val('');
 
           // iterate through sensor data
           sensorData.forEach(function (dataString) {
