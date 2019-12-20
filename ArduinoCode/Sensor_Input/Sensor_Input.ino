@@ -6,7 +6,7 @@
 
 NewPing sonar(SONAR1_trig, SONAR1_echo);
 
-// Dummy variables for debugging
+//DEBUG PLEASE REMOVE Dummy variables for debugging
 int dummyData = 0;
 bool dummyDataDirection = true;
 
@@ -74,14 +74,15 @@ String getSensorData()
   // LIMITSWITCH1
   output = output + getLimitSwitchData("limitSwitch1", LIMITSWITCH1);
 
+  //DEBUG PLEASE REMOVE
   output = output + "dummyData,num,"+dummyData+",dummy;";
 
   //DEBUG PLEASE REMOVE
-  output = output + "sonar2,num,11.5,in;Front Sonar,num,1.34,feet;";
-  if (digitalRead(LIMITSWITCH1) == HIGH)
+  if (dummyData%3 == 0)
   {
-    output = output + "debug.senors,str,This is some test code-ignore me,str;";
+    output = output + "debug.senors,str,This is some test code: "+dummyData+",str;";
   }
+
   return output;
 }
 
