@@ -5,7 +5,7 @@
 }
 
 .alive {
-    animation: beat 0.4 linear 0 infinite alternate;
+    animation: beat 0.4s linear 0 infinite alternate;
 }
 
 @keyframes beat {
