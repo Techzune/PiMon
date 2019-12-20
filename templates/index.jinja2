@@ -91,7 +91,7 @@
 
           // iterate through sensor data
           sensorData.forEach(function (dataString) {
-            if (dataString === "") return;
+            if (dataString.trim().length < 1) return; // empty or whitespace
 
             // split sensor data by comma
             const data = dataString.split(',');
