@@ -104,6 +104,13 @@
           // split the sensor data by semicolon
           const sensorData = value.split(';');
 
+          // First element should be time stamp
+          let data = sensorData[0].split(',');
+          let sentTime = data[1];
+          if (data[0] == "time") {
+            checkHeartBeat(sentTime);
+          }
+
           // iterate through sensor data
           sensorData.forEach(function (dataString) {
             if (dataString.trim().length < 1) return; // empty or whitespace
@@ -124,20 +131,13 @@
 
               } else {
                 // wtf data
-                updateOutDisplay(data[0] + ': ' + data[2] + '\n');
+                updateOutDisplay(data[0] + ' [' + sentTime + ']: ' + data[2] + '\n');
               }
 
             }
             else if (data.length > 0) {
-              
-              if (data[0] == "time") {
-                checkHeartBeat(data[1]);
-              }
               // wasn't actual data, just output string
-              else {
-                updateOutDisplay(dataString + '\n');
-              }
-
+              updateOutDisplay(dataString + '\n');
             }
           });
         });
