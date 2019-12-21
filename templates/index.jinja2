@@ -99,7 +99,7 @@
       let dateObj = new Date();
       let recievedTimeSeconds = (dateObj.getHours()*3600)+(dateObj.getMinutes()*60)+dateObj.getSeconds();
 
-      return recievedTimeSeconds - sentTimeSeconds < deltaSeconds;
+      return recievedTimeSeconds - sentTimeSeconds <= deltaSeconds;
     }
 
     // update display, with delay
