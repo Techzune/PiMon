@@ -62,6 +62,7 @@
       const $inAutoScroll = $('#in_autoScroll');
       const $boolDisplay = $('#bool_display');
       const $intDisplay = $('#int_display');
+      const $heart = $('#heart');
 
       // connect to stream
       const xhr = new XMLHttpRequest();
@@ -103,8 +104,10 @@
           // Dead connection
           if (data[0] == "time" && !connectionAlive(sentTime)) {
             console.log("dead\n");
+            heart.classList.remove("alive");
             return;
           }
+          heart.classList.add("alive");
 
           // clear the displays
           $intDisplay.val('');
