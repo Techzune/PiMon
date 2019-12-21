@@ -120,6 +120,7 @@
           return;
         }
         heart.classList.add("alive");
+        console.log("tick");
 
         // clear the displays
         $intDisplay.val('');
@@ -177,13 +178,13 @@
         </li>`
 
         document.getElementById("logNavBar").innerHTML += newNavPill;
-        console.log(logStreams[logName]+"\n");
       }
       
       // Concat old and new data
       let value = logStreams[logName] + '[' + sentTime + ']: ' + String(data) + '\n';
       // Store only the 'limit' number of characters
       logStreams[logName] = value.substring(value.length - limit);
+      console.log("tock");
     }
 
     function getCurrentStream() {
