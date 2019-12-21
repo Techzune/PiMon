@@ -78,10 +78,11 @@ String getSensorData()
   output = output + "dummyData,num,"+dummyData+",dummy;";
 
   //DEBUG PLEASE REMOVE
-  if (dummyData%3 == 0)
+  if (dummyData%3000 == 0)
   {
-    output = output + "debug.senors,str,This is some test code: "+dummyData+",str;";
+    output = output + "Dumb Chance,str, : "+dummyData+",str;";
   }
+  output = output + "tick,str,.,str;";
 
   return output;
 }
