@@ -63,126 +63,124 @@
 
 {% block extra_js %}
   <script>
-    $(function () {
-      // select page objects
-      const $outDisplay = $('#out_display');
-      const $inAutoScroll = $('#in_autoScroll');
-      const $boolDisplay = $('#bool_display');
-      const $intDisplay = $('#int_display');
-      const $heart = $('#heart');
-      var logStreams = {'misc':''};
-      var sentTime = "";
+    // select page objects
+    const $outDisplay = $('#out_display');
+    const $inAutoScroll = $('#in_autoScroll');
+    const $boolDisplay = $('#bool_display');
+    const $intDisplay = $('#int_display');
+    const $heart = $('#heart');
+    var logStreams = {'misc':''};
+    var sentTime = "";
 
-      // connect to stream
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', '{{ url_for('console_stream') }}');
-      xhr.send();
-      let position = 0;
+    // connect to stream
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '{{ url_for('console_stream') }}');
+    xhr.send();
+    let position = 0;
 
-      // update outDisplay with character limit
-      function updateOutDisplay(navPill) {
-        $outDisplay.val(logStreams[navPill.contentText]);
+    // update outDisplay with character limit
+    function updateOutDisplay(navPill) {
+      $outDisplay.val(logStreams[navPill.contentText]);
 
-        if ($inAutoScroll.hasClass('active'))
-          $outDisplay.scrollTop($outDisplay[0].scrollHeight);
-      }
+      if ($inAutoScroll.hasClass('active'))
+        $outDisplay.scrollTop($outDisplay[0].scrollHeight);
+    }
 
-      function connectionAlive(deltaSeconds = 1) {
-        sentTimeSeconds = sentTime.split(':');
-        sentTimeSeconds = (sentTimeSeconds[0]*3600)+(sentTimeSeconds[1]*60)+Number(sentTimeSeconds[2]);
+    function connectionAlive(deltaSeconds = 1) {
+      sentTimeSeconds = sentTime.split(':');
+      sentTimeSeconds = (sentTimeSeconds[0]*3600)+(sentTimeSeconds[1]*60)+Number(sentTimeSeconds[2]);
 
-        let dateObj = new Date();
-        let recievedTimeSeconds = (dateObj.getHours()*3600)+(dateObj.getMinutes()*60)+dateObj.getSeconds();
+      let dateObj = new Date();
+      let recievedTimeSeconds = (dateObj.getHours()*3600)+(dateObj.getMinutes()*60)+dateObj.getSeconds();
 
-        return recievedTimeSeconds - sentTimeSeconds < deltaSeconds;
-      }
+      return recievedTimeSeconds - sentTimeSeconds < deltaSeconds;
+    }
 
-      // update display, with delay
-      function update() {
-        let messages = xhr.responseText.split('\n');
-        messages.slice(position, -1).forEach(function (value) {
+    // update display, with delay
+    function update() {
+      let messages = xhr.responseText.split('\n');
+      messages.slice(position, -1).forEach(function (value) {
 
-          // split the sensor data by semicolon
-          const sensorData = value.split(';');
+        // split the sensor data by semicolon
+        const sensorData = value.split(';');
 
-          // First element should be time stamp
-          let data = sensorData[0].split(',');
-          sentTime = data[1];
+        // First element should be time stamp
+        let data = sensorData[0].split(',');
+        sentTime = data[1];
 
-          // Dead connection
-          if (data[0] == "time" && !connectionAlive(2)) {
-            heart.classList.remove("alive");
-            return;
-          }
-          heart.classList.add("alive");
-
-          // clear the displays
-          $intDisplay.val('');
-          $boolDisplay.val('');
-
-          // iterate through sensor data
-          sensorData.forEach( interpretData );
-        });
-      }
-
-      function interpretData(dataString) {
-        if (dataString.trim().length < 1) return; // empty or whitespace
-
-        // split sensor data by comma
-        const data = dataString.split(',');
-
-        // Skip time stamp data
-        if (data[0] == "time") return;
-
-        // is this actual data? (should have 4 values)
-        if (data.length > 3) {
-
-          if (data[1] === 'num') {
-            // number data
-            $intDisplay.val($intDisplay.val() + data[0] + ': ' + data[2] + ' ' + data[3] + '\n');
-
-          } else if (data[1] === 'bool') {
-            // boolean data
-            $boolDisplay.val($boolDisplay.val() + data[0] + ': ' + data[2] + ' ' + data[3] + '\n');
-
-          } else {
-            // Log data
-            interpretLogData(data);
-            {# updateOutDisplay(data[0] + ' [' + sentTime + ']: ' + data[2] + '\n'); #}
-          }
-
-        } else if (data.length > 0) {
-          // wasn't actual data, just output string
-          updateOutDisplay(dataString + '\n');
+        // Dead connection
+        if (data[0] == "time" && !connectionAlive(2)) {
+          heart.classList.remove("alive");
+          return;
         }
-      }
+        heart.classList.add("alive");
 
-      function interpretLogData(data, limit = 2048) {
-        let key = data[0];
+        // clear the displays
+        $intDisplay.val('');
+        $boolDisplay.val('');
 
-        // Does not have key or nav pill yet
-        if (!logStreams.hasOwnProperty(key)) {
-          logStreams[key] = "";
+        // iterate through sensor data
+        sensorData.forEach( interpretData );
+      });
+    }
 
-          let newNavPill = 
-          `<li class="nav-item">
-            <p class="nav-link mb-0" onclick="updateOutDisplay(this)"> ` + key + ` </p>
-          </li>`
+    function interpretData(dataString) {
+      if (dataString.trim().length < 1) return; // empty or whitespace
 
-          document.getElementById("logNavBar").innerHTML += newNavPill;
-          console.log(logStreams[key]+"\n");
+      // split sensor data by comma
+      const data = dataString.split(',');
+
+      // Skip time stamp data
+      if (data[0] == "time") return;
+
+      // is this actual data? (should have 4 values)
+      if (data.length > 3) {
+
+        if (data[1] === 'num') {
+          // number data
+          $intDisplay.val($intDisplay.val() + data[0] + ': ' + data[2] + ' ' + data[3] + '\n');
+
+        } else if (data[1] === 'bool') {
+          // boolean data
+          $boolDisplay.val($boolDisplay.val() + data[0] + ': ' + data[2] + ' ' + data[3] + '\n');
+
+        } else {
+          // Log data
+          interpretLogData(data);
+          {# updateOutDisplay(data[0] + ' [' + sentTime + ']: ' + data[2] + '\n'); #}
         }
-        
-        // Concat old and new data
-        let value = logStreams[key] + '[' + sentTime + ']: ' + String(data[2]) + '\n';
-        // Store only the 'limit' number of characters
-        logStreams[key] = value.substring(value.length - limit);
-      }
 
-      setInterval(function () {
-        // update the displays
-        update();
-      }, 250);
-    });
+      } else if (data.length > 0) {
+        // wasn't actual data, just output string
+        updateOutDisplay(dataString + '\n');
+      }
+    }
+
+    function interpretLogData(data, limit = 2048) {
+      let key = data[0];
+
+      // Does not have key or nav pill yet
+      if (!logStreams.hasOwnProperty(key)) {
+        logStreams[key] = "";
+
+        let newNavPill = 
+        `<li class="nav-item">
+          <p class="nav-link mb-0" onclick="updateOutDisplay(this)"> ` + key + ` </p>
+        </li>`
+
+        document.getElementById("logNavBar").innerHTML += newNavPill;
+        console.log(logStreams[key]+"\n");
+      }
+      
+      // Concat old and new data
+      let value = logStreams[key] + '[' + sentTime + ']: ' + String(data[2]) + '\n';
+      // Store only the 'limit' number of characters
+      logStreams[key] = value.substring(value.length - limit);
+    }
+
+    setInterval(function () {
+      // update the displays
+      update();
+    }, 250);
   </script>
 {% endblock %}
