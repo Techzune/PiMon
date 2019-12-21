@@ -60,7 +60,7 @@ String getLimitSwitchData(String name, int switchPin)
 String getSensorData()
 {
   // Sequence number
-  String output = "seq,"+(millis()%2000)+";";
+  String output = "seq,"+String(millis()%2000)+";";
 
   // sensor data: <sensorName>,<dataType>,<data>,<units>
   // Sensor data is composed of comma ',' separated attributes
