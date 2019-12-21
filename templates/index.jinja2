@@ -33,7 +33,14 @@
 
   <div class="card mt-4">
     <div class="card-header">
-      <label class="mb-0" for="out_display">Log</label>
+      <ul class="nav nav-tabs card-header-tabs" id="logNavBar">
+        <li class="nav-item">
+          <p class="nav-link active mb-0" onclick="console.log('clicked')"> First </p>
+        </li>
+        <li class="nav-item">
+          <p class="nav-link mb-0" onclick="console.log('clicked2')"> Second </p>
+        </li>
+      </ul>
     </div>
     <div class="card-body">
       <!-- console display -->
@@ -63,6 +70,7 @@
       const $boolDisplay = $('#bool_display');
       const $intDisplay = $('#int_display');
       const $heart = $('#heart');
+      var logStreams = {'misc':''};
 
       // connect to stream
       const xhr = new XMLHttpRequest();
@@ -114,39 +122,59 @@
           $boolDisplay.val('');
 
           // iterate through sensor data
-          sensorData.forEach(function (dataString) {
-            if (dataString.trim().length < 1) return; // empty or whitespace
-
-            // split sensor data by comma
-            const data = dataString.split(',');
-
-            // Skip time stamp data
-            if (data[0] == "time") return;
-
-            // is this actual data? (should have 4 values)
-            if (data.length > 3) {
-
-              if (data[1] === 'num') {
-                // number data
-                $intDisplay.val($intDisplay.val() + data[0] + ': ' + data[2] + ' ' + data[3] + '\n');
-
-              } else if (data[1] === 'bool') {
-                // boolean data
-                $boolDisplay.val($boolDisplay.val() + data[0] + ': ' + data[2] + ' ' + data[3] + '\n');
-
-              } else {
-                // wtf data
-                updateOutDisplay(data[0] + ' [' + sentTime + ']: ' + data[2] + '\n');
-              }
-
-            }
-            else if (data.length > 0) {
-              // wasn't actual data, just output string
-              updateOutDisplay(dataString + '\n');
-            }
-          });
+          sensorData.forEach( interpretData );
         });
-        position = messages.length - 1;
+      }
+
+      function interpretData(dataString) {
+        if (dataString.trim().length < 1) return; // empty or whitespace
+
+        // split sensor data by comma
+        const data = dataString.split(',');
+
+        // Skip time stamp data
+        if (data[0] == "time") return;
+
+        // is this actual data? (should have 4 values)
+        if (data.length > 3) {
+
+          if (data[1] === 'num') {
+            // number data
+            $intDisplay.val($intDisplay.val() + data[0] + ': ' + data[2] + ' ' + data[3] + '\n');
+
+          } else if (data[1] === 'bool') {
+            // boolean data
+            $boolDisplay.val($boolDisplay.val() + data[0] + ': ' + data[2] + ' ' + data[3] + '\n');
+
+          } else {
+            // Log data
+            interpretLogData(data, sentTime);
+            {# updateOutDisplay(data[0] + ' [' + sentTime + ']: ' + data[2] + '\n'); #}
+          }
+
+        } else if (data.length > 0) {
+          // wasn't actual data, just output string
+          updateOutDisplay(dataString + '\n');
+        }
+      }
+
+      function interpretLogData(data, sentTime, limit = 2048) {
+        let key = data[0];
+
+        // Does not have key or nav pill yet
+        if (!logStreams.hasOwnProperty(key)) {
+          logStreams[key] = "";
+          let logNavBar = document.getElementById("logNavBar");
+          let newNavPill = logNavBar.lastChild.cloneNode();
+
+          newNavPill.contentText = key;
+          logNavBar.appendChild(newNavPill);
+        }
+        
+        // Concat old and new data
+        let value = logStreams[key] + '[' + sentTime + ']: ' + String(data[2]) + '\n';
+        // Store only the 'limit' number of characters
+        logStreams[key] = value.substring(value.length - limit);
       }
 
       setInterval(function () {

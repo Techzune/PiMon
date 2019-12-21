@@ -24,7 +24,7 @@ def triggerSensorData(portName):
     command = command.encode()
     while True:
         port.write(command)
-        sleep(0.4)
+        sleep(0.25)
 
 
 def setupSerialHandlers():
