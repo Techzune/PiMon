@@ -7,7 +7,7 @@
 NewPing sonar(SONAR1_trig, SONAR1_echo);
 
 //DEBUG PLEASE REMOVE Dummy variables for debugging
-int dummyData = 0;
+unsigned dummyData = 0;
 bool dummyDataDirection = true;
 
 String incoming = "";
