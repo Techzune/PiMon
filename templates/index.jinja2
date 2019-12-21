@@ -35,10 +35,10 @@
     <div class="card-header">
       <ul class="nav nav-tabs card-header-tabs" id="logNavBar">
         <li class="nav-item">
-          <p class="nav-link active mb-0" onclick="console.log('clicked')"> First </p>
+          <p class="nav-link active mb-0" onclick="updateOutDisplay(this)"> First </p>
         </li>
         <li class="nav-item">
-          <p class="nav-link mb-0" onclick="console.log('clicked2')"> Second </p>
+          <p class="nav-link mb-0" onclick="updateOutDisplay(this)"> Second </p>
         </li>
       </ul>
     </div>
@@ -80,9 +80,8 @@
       let position = 0;
 
       // update outDisplay with character limit
-      function updateOutDisplay(newText, limit = 2048) {
-        let currentText = $outDisplay.val();
-        $outDisplay.val(currentText.substring(currentText.length - limit) + newText);
+      function updateOutDisplay(navPill) {
+        $outDisplay.val(logStreams[navPill.contentText]);
 
         if ($inAutoScroll.hasClass('active'))
           $outDisplay.scrollTop($outDisplay[0].scrollHeight);
@@ -159,7 +158,7 @@
         }
       }
 
-      function interpretLogData(data, sentTime, limit = 2048) {
+      function interpretLogData(data, limit = 2048) {
         let key = data[0];
 
         // Does not have key or nav pill yet
