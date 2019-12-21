@@ -78,7 +78,7 @@ String getSensorData()
   output = output + "dummyData,num,"+dummyData+",dummy;";
 
   //DEBUG PLEASE REMOVE
-  if (dummyData%3000 == 0)
+  if (dummyData%50 == 0)
   {
     output = output + "Dumb Chance,str, : "+dummyData+",str;";
   }
