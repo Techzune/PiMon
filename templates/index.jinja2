@@ -64,7 +64,8 @@
     const $intDisplay = $('#int_display');
     const $heart = $('#heart');
     var logStreams = {'currentStream':''};
-    var sentTime = "";
+    var seqNum = 0;
+    var watchDogTimer = 0;
 
     // connect to stream
     const xhr = new XMLHttpRequest();
@@ -92,14 +93,9 @@
         $outDisplay.scrollTop($outDisplay[0].scrollHeight);
     }
 
-    function connectionAlive(deltaSeconds = 1) {
-      sentTimeSeconds = sentTime.split(':');
-      sentTimeSeconds = (sentTimeSeconds[0]*3600)+(sentTimeSeconds[1]*60)+Number(sentTimeSeconds[2]);
-
-      let dateObj = new Date();
-      let recievedTimeSeconds = (dateObj.getHours()*3600)+(dateObj.getMinutes()*60)+dateObj.getSeconds();
-
-      return recievedTimeSeconds - sentTimeSeconds <= deltaSeconds;
+    function connectionAlive(deltaMilliseconds = 1000) {
+      let currentTime = (new Date()).getTime();
+      return currentTime - watchDogTimer < deltaMilliseconds;
     }
 
     // update display, with delay
@@ -112,13 +108,18 @@
 
         // First element should be time stamp
         let data = sensorData[0].split(',');
-        sentTime = data[1];
-
-        // Dead connection
-        if (data[0] == "time" && !connectionAlive()) {
-          heart.classList.remove("alive");
+        // Old message
+        if (data[0] == 'seq' && seqNum == data[1]) {
+          // Dead connection
+          if (!connectionAlive()) {
+            heart.classList.remove("alive");
+          }
+          // Still live, but no updates
           return;
         }
+        
+        // New message
+        watchDogTimer = (new Date()).getTime();
         heart.classList.add("alive");
 
         // clear the displays
@@ -138,7 +139,7 @@
       const data = dataString.split(',');
 
       // Skip time stamp data
-      if (data[0] == "time") return;
+      if (data[0] == "seq") return;
 
       // is this actual data? (should have 4 values)
       if (data.length > 3) {
@@ -180,8 +181,10 @@
         document.getElementById("logNavBar").innerHTML += newNavPill;
       }
       
+      let dateObj = new Date();
+      let time = "[" +dateObj.getHours()+ ":" +dateObj.getMinutes()+ ":" +dateObj.getSeconds()+ "." +Math.floor(dateObj.getMilliseconds()/100)+ "]";
       // Concat old and new data
-      let value = logStreams[logName] + '[' + sentTime + ']: ' + String(data) + '\n';
+      let value = logStreams[logName] + time = ': ' + String(data) + '\n';
       // Store only the 'limit' number of characters
       logStreams[logName] = value.substring(value.length - limit);
     }
@@ -196,6 +199,6 @@
     setInterval(function () {
       // update the displays
       update();
-    }, 333);
+    }, 150);
   </script>
 {% endblock %}

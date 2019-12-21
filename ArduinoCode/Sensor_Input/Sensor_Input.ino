@@ -59,7 +59,9 @@ String getLimitSwitchData(String name, int switchPin)
 // Aggregate data into message to be sent to Pi
 String getSensorData()
 {
-  String output = "";
+  // Sequence number
+  String output = "seq,"+(millis()%2000)+";";
+
   // sensor data: <sensorName>,<dataType>,<data>,<units>
   // Sensor data is composed of comma ',' separated attributes
   
