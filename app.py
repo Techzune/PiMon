@@ -20,7 +20,7 @@ def create_app():
     app = Flask(__name__)
 
     # render SCSS
-    scss = Bundle('site.scss', filters='libsass', output='site.css')
+    scss = Bundle('site.scss', 'heartbeat.css', filters='libsass', output='site.css')
     assets = Environment(app)
     assets.url = app.static_url_path
     assets.register('scss_all', scss)
@@ -48,7 +48,7 @@ def create_app():
 
         def events():
             while True:
-                yield red.get('msg')
+                yield "time,"+red.get('msg').decode('utf-8')
                 time.sleep(.25)
 
         return Response(events(), mimetype='text/plain')

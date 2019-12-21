@@ -6,6 +6,10 @@
 
 NewPing sonar(SONAR1_trig, SONAR1_echo);
 
+//DEBUG PLEASE REMOVE Dummy variables for debugging
+int dummyData = 0;
+bool dummyDataDirection = true;
+
 String incoming = "";
 String outgoing = "";
 
@@ -19,6 +23,21 @@ void setup()
 
 void loop() 
 {
+  if (dummyData <= 0)
+  {
+    // Start going up
+    dummyDataDirection = true;
+  }
+  else if (dummyData >= 16000)
+  {
+    // Start going down
+    dummyDataDirection = false;
+  }
+
+  if (dummyDataDirection)
+    dummyData = dummyData + 1;
+  else
+    dummyData = dummyData - 1;
 }
 
 // Generic data extractions and unit for each category of sensor
@@ -56,11 +75,14 @@ String getSensorData()
   output = output + getLimitSwitchData("limitSwitch1", LIMITSWITCH1);
 
   //DEBUG PLEASE REMOVE
-  output = output + "sonar2,num,11.5,in;Front Sonar,num,1.34,feet;";
-  if (digitalRead(LIMITSWITCH1) == HIGH)
+  output = output + "dummyData,num,"+dummyData+",dummy;";
+
+  //DEBUG PLEASE REMOVE
+  if (dummyData%3 == 0)
   {
-    output = output + "debug.senors,str,This is some test code-ignore me,str;";
+    output = output + "debug.senors,str,This is some test code: "+dummyData+",str;";
   }
+
   return output;
 }
 
@@ -81,7 +103,7 @@ void serialEvent()
   // reply if desired
   if (outgoing != "")
   {
-    Serial.print(outgoing + "\n");
+    Serial.println(outgoing);
     outgoing = "";
   }
   incoming = "";

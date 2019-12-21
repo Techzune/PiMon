@@ -62,6 +62,7 @@
       const $inAutoScroll = $('#in_autoScroll');
       const $boolDisplay = $('#bool_display');
       const $intDisplay = $('#int_display');
+      const $heart = $('#heart');
 
       // connect to stream
       const xhr = new XMLHttpRequest();
@@ -78,23 +79,49 @@
           $outDisplay.scrollTop($outDisplay[0].scrollHeight);
       }
 
+      function connectionAlive(sentTime, deltaSeconds = 1) {
+        sentTime = sentTime.split(':');
+        sentTime = (sentTime[0]*3600)+(sentTime[1]*60)+Number(sentTime[2]);
+
+        let dateObj = new Date();
+        let recievedTime = (dateObj.getHours()*3600)+(dateObj.getMinutes()*60)+dateObj.getSeconds();
+
+        return recievedTime - sentTime < deltaSeconds;
+      }
+
       // update display, with delay
       function update() {
         let messages = xhr.responseText.split('\n');
         messages.slice(position, -1).forEach(function (value) {
-          // clear the displays
-          $intDisplay.val('');
-          $boolDisplay.val('');
 
           // split the sensor data by semicolon
           const sensorData = value.split(';');
 
+          // First element should be time stamp
+          let data = sensorData[0].split(',');
+          let sentTime = data[1];
+
+          // Dead connection
+          if (data[0] == "time" && !connectionAlive(sentTime, 2)) {
+            console.log("dead\n");
+            heart.classList.remove("alive");
+            return;
+          }
+          heart.classList.add("alive");
+
+          // clear the displays
+          $intDisplay.val('');
+          $boolDisplay.val('');
+
           // iterate through sensor data
           sensorData.forEach(function (dataString) {
-            if (dataString === "") return;
+            if (dataString.trim().length < 1) return; // empty or whitespace
 
             // split sensor data by comma
             const data = dataString.split(',');
+
+            // Skip time stamp data
+            if (data[0] == "time") return;
 
             // is this actual data? (should have 4 values)
             if (data.length > 3) {
@@ -109,10 +136,11 @@
 
               } else {
                 // wtf data
-                updateOutDisplay(data[0] + ': ' + data[2] + ' ' + data[3] + '\n');
+                updateOutDisplay(data[0] + ' [' + sentTime + ']: ' + data[2] + '\n');
               }
 
-            } else if (data.length > 0) {
+            }
+            else if (data.length > 0) {
               // wasn't actual data, just output string
               updateOutDisplay(dataString + '\n');
             }

@@ -1,0 +1,15 @@
+/* Styles specific to heartbeat functionality */
+
+.alive {
+    animation: beat 0.4s linear 0s infinite alternate;
+    color: red;
+}
+
+@keyframes beat {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.5);
+    }
+}
