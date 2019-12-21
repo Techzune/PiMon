@@ -163,11 +163,13 @@
         // Does not have key or nav pill yet
         if (!logStreams.hasOwnProperty(key)) {
           logStreams[key] = "";
-          let logNavBar = document.getElementById("logNavBar");
-          let newNavPill = logNavBar.lastChild.cloneNode();
 
-          newNavPill.contentText = key;
-          logNavBar.appendChild(newNavPill);
+          let newNavPill = 
+          `<li class="nav-item">
+            <p class="nav-link mb-0" onclick="updateOutDisplay(this)"> ` + key + ` </p>
+          </li>`
+
+          document.getElementById("logNavBar").innerHTML += newNavPill;
           console.log(logStreams[key]+"\n");
         }
         
