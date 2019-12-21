@@ -36,7 +36,7 @@
       <ul class="nav nav-tabs card-header-tabs" id="logNavBar">
       </ul>
     </div>
-    <div class="card-body">
+    <div class="card-body mt-0">
       <!-- console display -->
       <textarea id="out_display" class="form-control bg-dark text-white border-white" disabled
                 rows="15"></textarea>
@@ -139,36 +139,33 @@
 
         } else {
           // Log data
-          interpretLogData(data);
-          {# updateOutDisplay(data[0] + ' [' + sentTime + ']: ' + data[2] + '\n'); #}
+          interpretLogData(data[0], data[2]);
         }
 
       } else if (data.length > 0) {
         // wasn't actual data, just output string
-        updateOutDisplay(dataString + '\n');
+        interpretLogData("misc", data);
       }
     }
 
-    function interpretLogData(data, limit = 2048) {
-      let key = data[0];
-
+    function interpretLogData(logName, data, limit = 2048) {
       // Does not have key or nav pill yet
-      if (!logStreams.hasOwnProperty(key)) {
-        logStreams[key] = "";
+      if (!logStreams.hasOwnProperty(logName)) {
+        logStreams[logName] = "";
 
         let newNavPill = 
         `<li class="nav-item">
-          <p class="nav-link mb-0" onclick="updateOutDisplay(this)">` + key + `</p>
+          <p class="nav-link mb-0" onclick="updateOutDisplay(this)">` + logName + `</p>
         </li>`
 
         document.getElementById("logNavBar").innerHTML += newNavPill;
-        console.log(logStreams[key]+"\n");
+        console.log(logStreams[logName]+"\n");
       }
       
       // Concat old and new data
-      let value = logStreams[key] + '[' + sentTime + ']: ' + String(data[2]) + '\n';
+      let value = logStreams[logName] + '[' + sentTime + ']: ' + String(data) + '\n';
       // Store only the 'limit' number of characters
-      logStreams[key] = value.substring(value.length - limit);
+      logStreams[logName] = value.substring(value.length - limit);
     }
 
     setInterval(function () {
