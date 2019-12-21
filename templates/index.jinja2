@@ -111,7 +111,6 @@
 
           // Dead connection
           if (data[0] == "time" && !connectionAlive(2)) {
-            console.log("dead\n");
             heart.classList.remove("alive");
             return;
           }
@@ -169,6 +168,7 @@
 
           newNavPill.contentText = key;
           logNavBar.appendChild(newNavPill);
+          console.log(logStreams[key]+"\n");
         }
         
         // Concat old and new data
