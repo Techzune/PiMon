@@ -105,7 +105,7 @@
     // update display, with delay
     function update() {
       let messages = xhr.responseText.split('\n');
-      messages.slice(position, -1).forEach(function (value) {
+      messages.slice(position).forEach(function (value) {
 
         // split the sensor data by semicolon
         const sensorData = value.split(';');
@@ -115,7 +115,7 @@
         sentTime = data[1];
 
         // Dead connection
-        if (data[0] == "time" && !connectionAlive(2)) {
+        if (data[0] == "time" && !connectionAlive()) {
           heart.classList.remove("alive");
           return;
         }
