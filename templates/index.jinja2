@@ -71,6 +71,7 @@
       const $intDisplay = $('#int_display');
       const $heart = $('#heart');
       var logStreams = {'misc':''};
+      var sentTime = "";
 
       // connect to stream
       const xhr = new XMLHttpRequest();
@@ -87,14 +88,14 @@
           $outDisplay.scrollTop($outDisplay[0].scrollHeight);
       }
 
-      function connectionAlive(sentTime, deltaSeconds = 1) {
-        sentTime = sentTime.split(':');
-        sentTime = (sentTime[0]*3600)+(sentTime[1]*60)+Number(sentTime[2]);
+      function connectionAlive(deltaSeconds = 1) {
+        sentTimeSeconds = sentTime.split(':');
+        sentTimeSeconds = (sentTimeSeconds[0]*3600)+(sentTimeSeconds[1]*60)+Number(sentTimeSeconds[2]);
 
         let dateObj = new Date();
-        let recievedTime = (dateObj.getHours()*3600)+(dateObj.getMinutes()*60)+dateObj.getSeconds();
+        let recievedTimeSeconds = (dateObj.getHours()*3600)+(dateObj.getMinutes()*60)+dateObj.getSeconds();
 
-        return recievedTime - sentTime < deltaSeconds;
+        return recievedTimeSeconds - sentTimeSeconds < deltaSeconds;
       }
 
       // update display, with delay
@@ -107,10 +108,10 @@
 
           // First element should be time stamp
           let data = sensorData[0].split(',');
-          let sentTime = data[1];
+          sentTime = data[1];
 
           // Dead connection
-          if (data[0] == "time" && !connectionAlive(sentTime, 2)) {
+          if (data[0] == "time" && !connectionAlive(2)) {
             console.log("dead\n");
             heart.classList.remove("alive");
             return;
@@ -148,7 +149,7 @@
 
           } else {
             // Log data
-            interpretLogData(data, sentTime);
+            interpretLogData(data);
             {# updateOutDisplay(data[0] + ' [' + sentTime + ']: ' + data[2] + '\n'); #}
           }
 
