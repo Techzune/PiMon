@@ -33,7 +33,7 @@
 
   <div class="card mt-4">
     <div class="card-header">
-      <ul class="nav nav-tabs card-header-tabs" id="logNavBar">
+      <ul class="nav nav-pills card-header-pills" id="logNavBar">
       </ul>
     </div>
     <div class="card-body mt-0">
@@ -42,7 +42,7 @@
                 rows="15"></textarea>
 
       <!-- console toolbar -->
-      <div class="btn-toolbar mt-2" role="toolbar">
+      <div class="btn-toolbar" role="toolbar">
         <!-- auto scroll button -->
         <div class="col-auto ml-auto px-0">
           <button id="in_autoScroll" type="button" data-toggle="button" class="btn btn-outline-primary active">
@@ -63,7 +63,7 @@
     const $boolDisplay = $('#bool_display');
     const $intDisplay = $('#int_display');
     const $heart = $('#heart');
-    var logStreams = {'misc':''};
+    var logStreams = {'currentStream':''};
     var sentTime = "";
 
     // connect to stream
@@ -72,8 +72,21 @@
     xhr.send();
     let position = 0;
 
-    function updateOutDisplay(navPill) {
-      $outDisplay.val(logStreams[navPill.innerText]);
+    function selectStream(newStream) {
+      let currentStream = getCurrentStream();
+      // No change
+      if (currentStream == newStream || currentStream == '') {
+        return;
+      }
+
+      document.getElementById(currentStream).classList.remove("active");
+      document.getElementById(newStream).classList.add("active");
+      setCurrentStream(newStream);
+      updateOutDisplay(newStream);
+    }
+
+    function updateOutDisplay(steamName) {
+      $outDisplay.val(logStreams[steamName]);
 
       if ($inAutoScroll.hasClass('active'))
         $outDisplay.scrollTop($outDisplay[0].scrollHeight);
@@ -139,12 +152,17 @@
 
         } else {
           // Log data
+          // Modify approperiate stream
           interpretLogData(data[0], data[2]);
+          // Reflow stream in case it was changed
+          updateOutDisplay(getCurrentStream());
         }
 
       } else if (data.length > 0) {
         // wasn't actual data, just output string
         interpretLogData("misc", data);
+        // Reflow stream in case it was changed
+        updateOutDisplay(getCurrentStream());
       }
     }
 
@@ -155,7 +173,7 @@
 
         let newNavPill = 
         `<li class="nav-item">
-          <p class="nav-link mb-0" onclick="updateOutDisplay(this)">` + logName + `</p>
+          <p class="nav-link mb-0" id="` + logName + `" onclick="updateOutDisplay(this.innerText)">` + logName + `</p>
         </li>`
 
         document.getElementById("logNavBar").innerHTML += newNavPill;
@@ -166,6 +184,13 @@
       let value = logStreams[logName] + '[' + sentTime + ']: ' + String(data) + '\n';
       // Store only the 'limit' number of characters
       logStreams[logName] = value.substring(value.length - limit);
+    }
+
+    function getCurrentStream() {
+      return logStreams["currentStream"];
+    }
+    function setCurrentStream(streamName) {
+      logStreams["currentStream"] = streamName;
     }
 
     setInterval(function () {
