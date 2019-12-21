@@ -73,7 +73,7 @@
     let position = 0;
 
     function updateOutDisplay(navPill) {
-      $outDisplay.val(logStreams[navPill.contentText]);
+      $outDisplay.val(logStreams[navPill.innerText]);
 
       if ($inAutoScroll.hasClass('active'))
         $outDisplay.scrollTop($outDisplay[0].scrollHeight);
@@ -158,7 +158,7 @@
 
         let newNavPill = 
         `<li class="nav-item">
-          <p class="nav-link mb-0" onclick="updateOutDisplay(this)"> ` + key + ` </p>
+          <p class="nav-link mb-0" onclick="updateOutDisplay(this)">` + key + `</p>
         </li>`
 
         document.getElementById("logNavBar").innerHTML += newNavPill;
