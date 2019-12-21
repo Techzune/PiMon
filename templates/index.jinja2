@@ -75,11 +75,11 @@
     function selectStream(newStream) {
       let currentStream = getCurrentStream();
       // No change
-      if (currentStream == newStream || currentStream == '') {
-        return;
-      }
+      if (currentStream == newStream) return;
 
-      document.getElementById(currentStream).classList.remove("active");
+      if (currentStream != '')
+        document.getElementById(currentStream).classList.remove("active");
+
       document.getElementById(newStream).classList.add("active");
       setCurrentStream(newStream);
       updateOutDisplay(newStream);
