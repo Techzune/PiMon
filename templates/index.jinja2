@@ -120,7 +120,6 @@
           return;
         }
         heart.classList.add("alive");
-        console.log("tick");
 
         // clear the displays
         $intDisplay.val('');
@@ -184,7 +183,6 @@
       let value = logStreams[logName] + '[' + sentTime + ']: ' + String(data) + '\n';
       // Store only the 'limit' number of characters
       logStreams[logName] = value.substring(value.length - limit);
-      console.log("tock");
     }
 
     function getCurrentStream() {
@@ -197,6 +195,6 @@
     setInterval(function () {
       // update the displays
       update();
-    }, 250);
+    }, 333);
   </script>
 {% endblock %}
