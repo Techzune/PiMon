@@ -6,6 +6,10 @@
 
 NewPing sonar(SONAR1_trig, SONAR1_echo);
 
+//DEBUG PLEASE REMOVE Dummy variables for debugging
+unsigned dummyData = 0;
+bool dummyDataDirection = true;
+
 String incoming = "";
 String outgoing = "";
 
@@ -19,14 +23,29 @@ void setup()
 
 void loop() 
 {
+  if (dummyData <= 0)
+  {
+    // Start going up
+    dummyDataDirection = true;
+  }
+  else if (dummyData >= 60000)
+  {
+    // Start going down
+    dummyDataDirection = false;
+  }
+
+  if (dummyDataDirection)
+    dummyData++;
+  else
+    dummyData--;
 }
 
 // Generic data extractions and unit for each category of sensor
 String getSonarData(String name, NewPing sonarSensor)
 {
   String output = name+",num,";
-  double medianTime = sonarSensor.ping_median(5);
-  output = output+sonarSensor.convert_cm(medianTime)+",cm;";
+  double medianTime = sonarSensor.ping_median(3);
+  output = output + sonarSensor.convert_cm(medianTime) + ",cm;";
   return output;
 }
 
@@ -40,7 +59,9 @@ String getLimitSwitchData(String name, int switchPin)
 // Aggregate data into message to be sent to Pi
 String getSensorData()
 {
-  String output = "";
+  // Sequence number
+  String output = "seq,"+String(millis()%2000)+";";
+
   // sensor data: <sensorName>,<dataType>,<data>,<units>
   // Sensor data is composed of comma ',' separated attributes
   
@@ -56,11 +77,15 @@ String getSensorData()
   output = output + getLimitSwitchData("limitSwitch1", LIMITSWITCH1);
 
   //DEBUG PLEASE REMOVE
-  output = output + "sonar2,num,11.5,in;Front Sonar,num,1.34,feet;";
-  if (digitalRead(LIMITSWITCH1) == HIGH)
+  output = output + "dummyData,num,"+dummyData+",dummy;";
+
+  //DEBUG PLEASE REMOVE
+  if (dummyData%50 == 0)
   {
-    output = output + "debug.senors,str,This is some test code-ignore me,str;";
+    output = output + "Dumb Chance,str, : "+dummyData+",str;";
   }
+  output = output + "tick,str,.,str;";
+
   return output;
 }
 
@@ -81,7 +106,7 @@ void serialEvent()
   // reply if desired
   if (outgoing != "")
   {
-    Serial.print(outgoing + "\n");
+    Serial.println(outgoing);
     outgoing = "";
   }
   incoming = "";

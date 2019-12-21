@@ -1,5 +1,5 @@
 from threading import Thread
-from time import sleep
+from time import sleep, strftime
 
 import redis
 import serial
@@ -14,7 +14,7 @@ def serialReader(portName):
     while True:
         readSerial = port.readline().decode('utf-8')
         red.set('msg', readSerial)
-        # print(readSerial)
+        
         sleep(0.1)
 
 
@@ -24,7 +24,7 @@ def triggerSensorData(portName):
     command = command.encode()
     while True:
         port.write(command)
-        sleep(0.4)
+        sleep(0.333)
 
 
 def setupSerialHandlers():
