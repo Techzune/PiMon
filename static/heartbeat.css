@@ -1,7 +1,7 @@
 /* Styles specific to heartbeat functionality */
 
 .alive {
-    animation: beat 0.4s linear 0 infinite alternate;
+    animation: beat 0.4s linear 0s infinite alternate;
     color: red;
 }
 
