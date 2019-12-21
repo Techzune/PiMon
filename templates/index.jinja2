@@ -117,9 +117,12 @@
           // Still live, but no updates
           return;
         }
-        
         // New message
-        watchDogTimer = (new Date()).getTime();
+        else if (data[0] == 'seq') {
+          seqNum = data[1];
+          watchDogTimer = (new Date()).getTime();
+        }
+        
         heart.classList.add("alive");
 
         // clear the displays
