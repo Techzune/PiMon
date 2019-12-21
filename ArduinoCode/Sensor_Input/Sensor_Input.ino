@@ -28,7 +28,7 @@ void loop()
     // Start going up
     dummyDataDirection = true;
   }
-  else if (dummyData >= 16000)
+  else if (dummyData >= 60000)
   {
     // Start going down
     dummyDataDirection = false;
@@ -38,6 +38,8 @@ void loop()
     dummyData = dummyData + 1;
   else
     dummyData = dummyData - 1;
+  
+  delayMicroseconds(10);
 }
 
 // Generic data extractions and unit for each category of sensor
