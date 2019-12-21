@@ -105,7 +105,7 @@
     // update display, with delay
     function update() {
       let messages = xhr.responseText.split('\n');
-      messages.slice(position).forEach(function (value) {
+      messages.slice(position, -1).forEach(function (value) {
 
         // split the sensor data by semicolon
         const sensorData = value.split(';');
