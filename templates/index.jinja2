@@ -102,7 +102,7 @@
           let sentTime = data[1];
 
           // Dead connection
-          if (data[0] == "time" && !connectionAlive(sentTime)) {
+          if (data[0] == "time" && !connectionAlive(sentTime, 2)) {
             console.log("dead\n");
             heart.classList.remove("alive");
             return;
