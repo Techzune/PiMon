@@ -33,15 +33,16 @@
 
   <div class="card mt-4">
     <div class="card-header">
-      <label class="mb-0" for="out_display">Log</label>
+      <ul class="nav nav-pills card-header-pills" id="logNavBar">
+      </ul>
     </div>
-    <div class="card-body">
+    <div class="card-body mt-0">
       <!-- console display -->
       <textarea id="out_display" class="form-control bg-dark text-white border-white" disabled
                 rows="15"></textarea>
 
       <!-- console toolbar -->
-      <div class="btn-toolbar mt-2" role="toolbar">
+      <div class="btn-toolbar" role="toolbar">
         <!-- auto scroll button -->
         <div class="col-auto ml-auto px-0">
           <button id="in_autoScroll" type="button" data-toggle="button" class="btn btn-outline-primary active">
@@ -56,103 +57,151 @@
 
 {% block extra_js %}
   <script>
-    $(function () {
-      // select page objects
-      const $outDisplay = $('#out_display');
-      const $inAutoScroll = $('#in_autoScroll');
-      const $boolDisplay = $('#bool_display');
-      const $intDisplay = $('#int_display');
-      const $heart = $('#heart');
+    // select page objects
+    const $outDisplay = $('#out_display');
+    const $inAutoScroll = $('#in_autoScroll');
+    const $boolDisplay = $('#bool_display');
+    const $intDisplay = $('#int_display');
+    const $heart = $('#heart');
+    var logStreams = {'currentStream':''};
+    var seqNum = 0;
+    var watchDogTimer = 0;
 
-      // connect to stream
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', '{{ url_for('console_stream') }}');
-      xhr.send();
-      let position = 0;
+    // connect to stream
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '{{ url_for('console_stream') }}');
+    xhr.send();
+    let position = 0;
 
-      // update outDisplay with character limit
-      function updateOutDisplay(newText, limit = 2048) {
-        let currentText = $outDisplay.val();
-        $outDisplay.val(currentText.substring(currentText.length - limit) + newText);
+    function selectStream(newStream) {
+      let currentStream = getCurrentStream();
+      // No change
+      if (currentStream == newStream) return;
 
-        if ($inAutoScroll.hasClass('active'))
-          $outDisplay.scrollTop($outDisplay[0].scrollHeight);
-      }
+      if (currentStream != '')
+        document.getElementById(currentStream).classList.remove("active");
 
-      function connectionAlive(sentTime, deltaSeconds = 1) {
-        sentTime = sentTime.split(':');
-        sentTime = (sentTime[0]*3600)+(sentTime[1]*60)+Number(sentTime[2]);
+      document.getElementById(newStream).classList.add("active");
+      setCurrentStream(newStream);
+      updateOutDisplay(newStream);
+    }
 
-        let dateObj = new Date();
-        let recievedTime = (dateObj.getHours()*3600)+(dateObj.getMinutes()*60)+dateObj.getSeconds();
+    function updateOutDisplay(steamName) {
+      $outDisplay.val(logStreams[steamName]);
 
-        return recievedTime - sentTime < deltaSeconds;
-      }
+      if ($inAutoScroll.hasClass('active'))
+        $outDisplay.scrollTop($outDisplay[0].scrollHeight);
+    }
 
-      // update display, with delay
-      function update() {
-        let messages = xhr.responseText.split('\n');
-        messages.slice(position, -1).forEach(function (value) {
+    function connectionAlive(deltaMilliseconds = 1000) {
+      let currentTime = (new Date()).getTime();
+      return currentTime - watchDogTimer < deltaMilliseconds;
+    }
 
-          // split the sensor data by semicolon
-          const sensorData = value.split(';');
+    // update display, with delay
+    function update() {
+      let messages = xhr.responseText.split('\n');
+      messages.slice(position, -1).forEach(function (value) {
 
-          // First element should be time stamp
-          let data = sensorData[0].split(',');
-          let sentTime = data[1];
+        // split the sensor data by semicolon
+        const sensorData = value.split(';');
 
+        // First element should be time stamp
+        let data = sensorData[0].split(',');
+        // Old message
+        if (data[0] == 'seq' && seqNum == data[1]) {
           // Dead connection
-          if (data[0] == "time" && !connectionAlive(sentTime, 2)) {
-            console.log("dead\n");
+          if (!connectionAlive()) {
             heart.classList.remove("alive");
-            return;
           }
-          heart.classList.add("alive");
+          // Still live, but no updates
+          return;
+        }
+        // New message
+        else if (data[0] == 'seq') {
+          seqNum = data[1];
+          watchDogTimer = (new Date()).getTime();
+        }
+        
+        heart.classList.add("alive");
 
-          // clear the displays
-          $intDisplay.val('');
-          $boolDisplay.val('');
+        // clear the displays
+        $intDisplay.val('');
+        $boolDisplay.val('');
 
-          // iterate through sensor data
-          sensorData.forEach(function (dataString) {
-            if (dataString.trim().length < 1) return; // empty or whitespace
+        // iterate through sensor data
+        sensorData.forEach( interpretData );
+      });
+      position = messages.length - 1;
+    }
 
-            // split sensor data by comma
-            const data = dataString.split(',');
+    function interpretData(dataString) {
+      if (dataString.trim().length < 1) return; // empty or whitespace
 
-            // Skip time stamp data
-            if (data[0] == "time") return;
+      // split sensor data by comma
+      const data = dataString.split(',');
 
-            // is this actual data? (should have 4 values)
-            if (data.length > 3) {
+      // Skip time stamp data
+      if (data[0] == "seq") return;
 
-              if (data[1] === 'num') {
-                // number data
-                $intDisplay.val($intDisplay.val() + data[0] + ': ' + data[2] + ' ' + data[3] + '\n');
+      // is this actual data? (should have 4 values)
+      if (data.length > 3) {
 
-              } else if (data[1] === 'bool') {
-                // boolean data
-                $boolDisplay.val($boolDisplay.val() + data[0] + ': ' + data[2] + ' ' + data[3] + '\n');
+        if (data[1] === 'num') {
+          // number data
+          $intDisplay.val($intDisplay.val() + data[0] + ': ' + data[2] + ' ' + data[3] + '\n');
 
-              } else {
-                // wtf data
-                updateOutDisplay(data[0] + ' [' + sentTime + ']: ' + data[2] + '\n');
-              }
+        } else if (data[1] === 'bool') {
+          // boolean data
+          $boolDisplay.val($boolDisplay.val() + data[0] + ': ' + data[2] + ' ' + data[3] + '\n');
 
-            }
-            else if (data.length > 0) {
-              // wasn't actual data, just output string
-              updateOutDisplay(dataString + '\n');
-            }
-          });
-        });
-        position = messages.length - 1;
+        } else {
+          // Log data
+          // Modify approperiate stream
+          interpretLogData(data[0], data[2]);
+          // Reflow stream in case it was changed
+          updateOutDisplay(getCurrentStream());
+        }
+
+      } else if (data.length > 0) {
+        // wasn't actual data, just output string
+        interpretLogData("misc", data);
+        // Reflow stream in case it was changed
+        updateOutDisplay(getCurrentStream());
       }
+    }
 
-      setInterval(function () {
-        // update the displays
-        update();
-      }, 250);
-    });
+    function interpretLogData(logName, data, limit = 2048) {
+      // Does not have key or nav pill yet
+      if (!logStreams.hasOwnProperty(logName)) {
+        logStreams[logName] = "";
+
+        let newNavPill = 
+        `<li class="nav-item">
+          <p class="nav-link mb-0" id="` + logName + `" onclick="selectStream(this.innerText)">` + logName + `</p>
+        </li>`
+
+        document.getElementById("logNavBar").innerHTML += newNavPill;
+      }
+      
+      let dateObj = new Date();
+      let time = "[" +dateObj.getHours()+ ":" +dateObj.getMinutes()+ ":" +dateObj.getSeconds()+ "." +Math.floor(dateObj.getMilliseconds()/100)+ "]";
+      // Concat old and new data
+      let value = logStreams[logName] + time + ': ' + String(data) + '\n';
+      // Store only the 'limit' number of characters
+      logStreams[logName] = value.substring(value.length - limit);
+    }
+
+    function getCurrentStream() {
+      return logStreams["currentStream"];
+    }
+    function setCurrentStream(streamName) {
+      logStreams["currentStream"] = streamName;
+    }
+
+    setInterval(function () {
+      // update the displays
+      update();
+    }, 150);
   </script>
 {% endblock %}

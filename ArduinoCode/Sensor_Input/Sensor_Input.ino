@@ -7,7 +7,7 @@
 NewPing sonar(SONAR1_trig, SONAR1_echo);
 
 //DEBUG PLEASE REMOVE Dummy variables for debugging
-int dummyData = 0;
+unsigned dummyData = 0;
 bool dummyDataDirection = true;
 
 String incoming = "";
@@ -28,24 +28,24 @@ void loop()
     // Start going up
     dummyDataDirection = true;
   }
-  else if (dummyData >= 16000)
+  else if (dummyData >= 60000)
   {
     // Start going down
     dummyDataDirection = false;
   }
 
   if (dummyDataDirection)
-    dummyData = dummyData + 1;
+    dummyData++;
   else
-    dummyData = dummyData - 1;
+    dummyData--;
 }
 
 // Generic data extractions and unit for each category of sensor
 String getSonarData(String name, NewPing sonarSensor)
 {
   String output = name+",num,";
-  double medianTime = sonarSensor.ping_median(5);
-  output = output+sonarSensor.convert_cm(medianTime)+",cm;";
+  double medianTime = sonarSensor.ping_median(3);
+  output = output + sonarSensor.convert_cm(medianTime) + ",cm;";
   return output;
 }
 
@@ -59,7 +59,9 @@ String getLimitSwitchData(String name, int switchPin)
 // Aggregate data into message to be sent to Pi
 String getSensorData()
 {
-  String output = "";
+  // Sequence number
+  String output = "seq,"+String(millis()%2000)+";";
+
   // sensor data: <sensorName>,<dataType>,<data>,<units>
   // Sensor data is composed of comma ',' separated attributes
   
@@ -78,10 +80,11 @@ String getSensorData()
   output = output + "dummyData,num,"+dummyData+",dummy;";
 
   //DEBUG PLEASE REMOVE
-  if (dummyData%3 == 0)
+  if (dummyData%50 == 0)
   {
-    output = output + "debug.senors,str,This is some test code: "+dummyData+",str;";
+    output = output + "Dumb Chance,str, : "+dummyData+",str;";
   }
+  output = output + "tick,str,.,str;";
 
   return output;
 }

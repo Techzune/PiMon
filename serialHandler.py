@@ -13,7 +13,7 @@ def serialReader(portName):
     port = serial.Serial(portName, 115200)
     while True:
         readSerial = port.readline().decode('utf-8')
-        red.set('msg', strftime("%H:%M:%S;")+readSerial)
+        red.set('msg', readSerial)
         
         sleep(0.1)
 
@@ -24,7 +24,7 @@ def triggerSensorData(portName):
     command = command.encode()
     while True:
         port.write(command)
-        sleep(0.4)
+        sleep(0.333)
 
 
 def setupSerialHandlers():
