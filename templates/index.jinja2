@@ -184,7 +184,7 @@
       let dateObj = new Date();
       let time = "[" +dateObj.getHours()+ ":" +dateObj.getMinutes()+ ":" +dateObj.getSeconds()+ "." +Math.floor(dateObj.getMilliseconds()/100)+ "]";
       // Concat old and new data
-      let value = logStreams[logName] + time = ': ' + String(data) + '\n';
+      let value = logStreams[logName] + time + ': ' + String(data) + '\n';
       // Store only the 'limit' number of characters
       logStreams[logName] = value.substring(value.length - limit);
     }
