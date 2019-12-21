@@ -35,19 +35,17 @@ void loop()
   }
 
   if (dummyDataDirection)
-    dummyData = dummyData + 1;
+    dummyData++;
   else
-    dummyData = dummyData - 1;
-  
-  delayMicroseconds(10);
+    dummyData--;
 }
 
 // Generic data extractions and unit for each category of sensor
 String getSonarData(String name, NewPing sonarSensor)
 {
   String output = name+",num,";
-  double medianTime = sonarSensor.ping_median(5);
-  output = output+sonarSensor.convert_cm(medianTime)+",cm;";
+  double medianTime = sonarSensor.ping_median(3);
+  output = output + sonarSensor.convert_cm(medianTime) + ",cm;";
   return output;
 }
 
