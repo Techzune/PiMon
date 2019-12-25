@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <NewPing.h>
 
 #define SONAR1_trig 12
@@ -12,6 +13,53 @@ bool dummyDataDirection = true;
 
 String incoming = "";
 String outgoing = "";
+
+class JsonStringBuilder
+{
+  private:
+    String message;
+
+  public:
+    // I wanted default parameters of 1 then 10, but Arduino can ONLY have defaults in the
+    //  prototype, not in the defintion. When this is moved to a library, define defaults
+    //  in the header file's prototypes
+    JsonStringBuilder(int estimatedNumberOfElements, int estimatedElementSize)
+    {
+      message = "";
+      message.reserve((estimatedElementSize+4)*estimatedNumberOfElements);
+    }
+
+    // Overload for string data, needs quotes \"
+    void add(String propertyName, String propertyValue)
+    {
+      message += "\""+ propertyName +"\":\""+ propertyValue +"\",";
+    }
+
+    // Overload for other JSON builders, uses getJsonString and no quotes
+    void add(String propertyName, JsonStringBuilder propertyValue)
+    {
+      message += "\""+ propertyName +"\":"+ propertyValue.getJsonString() +",";
+    }
+
+    // Overload for bool data, write as true/false not 1/0
+    void add(String propertyName, bool propertyValue)
+    {
+      message += "\""+ propertyName +"\":"+ String(propertyValue?"true":"false") +",";
+    }
+
+    template <class T>
+    void add(String propertyName, T propertyValue)
+    {
+      // Name requires quotes, thus they must be escaped as \"
+      message += "\""+ propertyName +"\":"+ propertyValue +",";
+    }
+
+    String getJsonString()
+    {
+      // Cut off last comma , and encompass in braces {}
+      return "{"+ message.substring(0, message.length()-1) +"}";
+    }
+};
 
 void setup() 
 {
@@ -40,53 +88,52 @@ void loop()
     dummyData--;
 }
 
-// Generic data extractions and unit for each category of sensor
-String getSonarData(String name, NewPing sonarSensor)
+// Get Sonar data in json style string
+JsonStringBuilder getSonarData(NewPing sonarSensor)
 {
-  String output = name+",num,";
-  double medianTime = sonarSensor.ping_median(3);
-  output = output + sonarSensor.convert_cm(medianTime) + ",cm;";
+  JsonStringBuilder output = JsonStringBuilder(2,6);
+  output.add("data", sonarSensor.convert_cm(sonarSensor.ping_median(3)));
+  output.add("units", String("cm"));
   return output;
 }
 
-String getLimitSwitchData(String name, int switchPin)
+// Get Limit Switch data in json style string
+bool getLimitSwitchData(int switchPin)
 {
-  String output = name+",bool,";
-  output = output + digitalRead(switchPin) + ",bool;";
-  return output;
+  return digitalRead(switchPin);
 }
 
 // Aggregate data into message to be sent to Pi
 String getSensorData()
 {
-  // Sequence number
-  String output = "seq,"+String(millis()%2000)+";";
+  JsonStringBuilder output = JsonStringBuilder(4,12);
+  output.add("ack",millis()%2000);
 
-  // sensor data: <sensorName>,<dataType>,<data>,<units>
-  // Sensor data is composed of comma ',' separated attributes
-  
-  // message data: <sensorData>;<sensorData>;\n
-  // Messages are composed of semicolon ';' separated sensor readings and end with newline '\n'
+  // This follows the JSON format
+  // Note that only numeric data has units, other sensors can be simple objects
+  // numeric data: "sensorName":{"data":<data>,"units":<units>}
+  // Simple data: "sensorName":<data>
+  // message data: {"ack":<millis>,"sensorName":{sensorData},"sensorName":<sensorData>}\n
   
   //Sonar sensors:
   // sonar
-  output = output + getSonarData("sonar1",sonar);
+  output.add("sonar1",getSonarData(sonar));
 
   //Limit switch sensors:
   // LIMITSWITCH1
-  output = output + getLimitSwitchData("limitSwitch1", LIMITSWITCH1);
+  output.add("limitSwitch1", getLimitSwitchData(LIMITSWITCH1));
 
   //DEBUG PLEASE REMOVE
-  output = output + "dummyData,num,"+dummyData+",dummy;";
+  output.add("dummyData", "{\"data\":"+String(dummyData)+",\"units\":\"dummy\"}");
 
   //DEBUG PLEASE REMOVE
   if (dummyData%50 == 0)
   {
-    output = output + "Dumb Chance,str, : "+dummyData+",str;";
+    output.add("Dumb Chance", String(dummyData));
   }
-  output = output + "tick,str,.,str;";
+  output.add("tick", String("."));
 
-  return output;
+  return output.getJsonString();
 }
 
 // Serial input parser
