@@ -1,91 +1,31 @@
 #include <Arduino.h>
 #include <NewPing.h>
+#include "JsonStringBuilder.h"
+
+//DEBUG Library: For debug testing and performance testing
+#include "DebugAndPerformanceTest.h"
 
 #define SONAR1_trig 12
 #define SONAR1_echo 11
 #define LIMITSWITCH1 8
 
 NewPing sonar(SONAR1_trig, SONAR1_echo);
-
-//DEBUG PLEASE REMOVE Dummy variables for debugging
-unsigned dummyData = 0;
-bool dummyDataDirection = true;
-
-String incoming = "";
-String outgoing = "";
-
-class JsonStringBuilder
-{
-  private:
-    String message;
-
-  public:
-    // I wanted default parameters of 1 then 10, but Arduino can ONLY have defaults in the
-    //  prototype, not in the defintion. When this is moved to a library, define defaults
-    //  in the header file's prototypes
-    JsonStringBuilder(int estimatedNumberOfElements, int estimatedElementSize)
-    {
-      message = "";
-      message.reserve((estimatedElementSize+4)*estimatedNumberOfElements);
-    }
-
-    // Overload for string data, needs quotes \"
-    void add(String propertyName, String propertyValue)
-    {
-      message += "\""+ propertyName +"\":\""+ propertyValue +"\",";
-    }
-
-    // Overload for other JSON builders, uses getJsonString and no quotes
-    void add(String propertyName, JsonStringBuilder propertyValue)
-    {
-      message += "\""+ propertyName +"\":"+ propertyValue.getJsonString() +",";
-    }
-
-    // Overload for bool data, write as true/false not 1/0
-    void add(String propertyName, bool propertyValue)
-    {
-      message += "\""+ propertyName +"\":"+ String(propertyValue?"true":"false") +",";
-    }
-
-    template <class T>
-    void add(String propertyName, T propertyValue)
-    {
-      // Name requires quotes, thus they must be escaped as \"
-      message += "\""+ propertyName +"\":"+ propertyValue +",";
-    }
-
-    String getJsonString()
-    {
-      // Cut off last comma , and encompass in braces {}
-      return "{"+ message.substring(0, message.length()-1) +"}";
-    }
-};
+String incoming;
 
 void setup() 
 {
   Serial.begin(115200);
   Serial.setTimeout(2);
 
+  incoming.reserve(50);
+  incoming = "";
+
   pinMode(LIMITSWITCH1, INPUT_PULLUP);
 }
 
 void loop() 
 {
-  if (dummyData <= 0)
-  {
-    // Start going up
-    dummyDataDirection = true;
-  }
-  else if (dummyData >= 60000)
-  {
-    // Start going down
-    dummyDataDirection = false;
-  }
-
-  if (dummyDataDirection)
-    dummyData++;
-  else
-    dummyData--;
+  testCode();
 }
 
 // Get Sonar data in json style string
@@ -104,10 +44,9 @@ bool getLimitSwitchData(int switchPin)
 }
 
 // Aggregate data into message to be sent to Pi
-String getSensorData()
+void getSensorData(JsonStringBuilder &outgoing)
 {
-  JsonStringBuilder output = JsonStringBuilder(4,12);
-  output.add("ack",millis()%2000);
+  outgoing.add("ack",millis()%2000);
 
   // This follows the JSON format
   // Note that only numeric data has units, other sensors can be simple objects
@@ -117,53 +56,48 @@ String getSensorData()
   
   //Sonar sensors:
   // sonar
-  output.add("sonar1",getSonarData(sonar));
+  outgoing.add("sonar1",getSonarData(sonar));
 
   //Limit switch sensors:
   // LIMITSWITCH1
-  output.add("limitSwitch1", getLimitSwitchData(LIMITSWITCH1));
-
-  //DEBUG PLEASE REMOVE
-  output.add("dummyData", "{\"data\":"+String(dummyData)+",\"units\":\"dummy\"}");
-
-  //DEBUG PLEASE REMOVE
-  if (dummyData%50 == 0)
-  {
-    output.add("Dumb Chance", String(dummyData));
-  }
-  output.add("tick", String("."));
-
-  return output.getJsonString();
+  outgoing.add("limitSwitch1", getLimitSwitchData(LIMITSWITCH1));
 }
 
 // Serial input parser
 void serialEvent()
 {
-  // recieve input
+  // recieve command, only one allowed
   while (Serial.available())
   {
     String readString = Serial.readString();
     incoming += readString;
   }
   incoming.trim();
+  // Constructor values are the expected 90% range. I expect it to be <= 6 properties with an average 
+  //  value of 10 bytes 90% of the time 
+  JsonStringBuilder outgoing = JsonStringBuilder(6,10);
 
   // command interpreters
-  outgoing = cmdGetSensorData(incoming);
+  cmdGetSensors(incoming, outgoing);
+
+  //DEBUG Calls to debugging Functions 
+  getPerformanceData(outgoing);
+  getTestData(outgoing);
 
   // reply if desired
-  if (outgoing != "")
+  if (!outgoing.empty())
   {
-    Serial.println(outgoing);
-    outgoing = "";
+    Serial.println(outgoing.getJsonString());
   }
   incoming = "";
 }
 
-String cmdGetSensorData(String command)
+bool cmdGetSensors(String command, JsonStringBuilder &outgoing)
 {
   if (command.compareTo("get sensors") == 0)
   {
-    return getSensorData();
+    getSensorData(outgoing);
+    return true;
   }
-  return "";
+  return false;
 }
