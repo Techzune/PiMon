@@ -22,20 +22,46 @@ void testCode()
 
 // To be run in serialEvent
 //DEBUG Function: Get various performance statistics
-void getPerformanceData(JsonStringBuilder &outgoing)
+void getPerformanceData(JsonSerialStream &outgoing)
+{
+  getTimingData(outgoing);
+  getMemoryData(outgoing);
+}
+
+// To be run in serialEvent
+//DEBUG Function: Get timing statistics
+void getTimingData(JsonSerialStream &outgoing)
 {
   // Show avg time to count dummyData
-  outgoing.add("avgDummyTime", "{\"data\":"+String(avgDummyTime)+",\"units\":\"ms\"}");
+  outgoing.addNestedObject("avgDummyTime");
+  outgoing.addProperty("data", avgDummyTime);
+  outgoing.addProperty("units", "ms");
+  outgoing.closeNestedObject();
+}
+
+// To be run in serialEvent
+//DEBUG Function: Get various RAM statistics
+void getMemoryData(JsonSerialStream &outgoing)
+{
   // Show heap fragmentation
-  outgoing.add("Heap Fragmentation", "{\"data\":"+String(getFragmentation())+",\"units\":\"%\"}");
+  outgoing.addNestedObject("Heap Fragmentation");
+  outgoing.addProperty("data", getFragmentation());
+  outgoing.addProperty("units", "%");
+  outgoing.closeNestedObject();
+
+  // Show Free memory
+  outgoing.addNestedObject("Free memory");
+  outgoing.addProperty("data", getTotalAvailableMemory());
+  outgoing.addProperty("units", "bytes");
+  outgoing.closeNestedObject();
 }
 
 // To be run in serialEvent
 //DEBUG Function: Get various performance statistics
-void getTestData(JsonStringBuilder &outgoing)
+void getTestData(JsonSerialStream &outgoing)
 {
-  outgoing.add("tick", String("."));
+  outgoing.addProperty("tick", ".");
   if (dummyData % 50 == 0) {
-    outgoing.add("Dumb Chance", String(dummyData));
+    outgoing.addPropertyAsString("Dumb Chance", dummyData);
   }
 }
