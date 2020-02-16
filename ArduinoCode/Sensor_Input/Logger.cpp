@@ -17,12 +17,12 @@ Logger::Logger(int logBookSize)
 }
 
 // Add log comment to log book, adding two segments with error checking
-// void log(S logStream, String &data)
-// void log(S logStream, T data)
-// bool logSafe(S logStream, T data)
+// void logUnsafe(S logStream, String &data)
+// void logUnsafe(S logStream, T data)
+// bool log(S logStream, T data)
 
 // Add log comment to log book, adding two segments with error checking
-bool Logger::logSafe(String logStream, String data)
+bool Logger::log(String logStream, String data)
 {
   // if dangerously long
   if (logBook.length() + logStream.length() + logStream.length() >= logBookCapacity)

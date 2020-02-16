@@ -32,7 +32,7 @@ class Logger
     //  the length of the log (Possibly beyond log book capacity)
     // Saves some RAM
     template <class S>
-    void log(S logStream, String &data)
+    void logUnsafe(S logStream, String &data)
     {
       logBook += logStream;
       logBook += '\v'; // This is a vertical tab, a completely unused char
@@ -44,7 +44,7 @@ class Logger
     //  the length of the log (Possibly beyond log book capacity)
     // Saves some RAM
     template <class S, class T>
-    void log(S logStream, T data)
+    void logUnsafe(S logStream, T data)
     {
       logBook += logStream;
       logBook += '\v'; // This is a vertical tab, a completely unused char
@@ -53,13 +53,13 @@ class Logger
     }
 
     // Add log comment to log book, adding two segments with error checking
-    bool logSafe(String logStream, String data);
+    bool log(String logStream, String data);
 
     // Add log comment to log book, adding two segments with error checking
     template <class S, class T>
-    bool logSafe(S logStream, T data)
+    bool log(S logStream, T data)
     {
-      return logSafe(String(logStream),String(data));
+      return log(String(logStream),String(data));
     }
 
     // Add all log comments to the Stream 
