@@ -1,122 +1,114 @@
+#include <Arduino.h>
 #include <NewPing.h>
+#include "src/SubModules/JsonSerialStream/JsonSerialStream.h"
+#include "src/SubModules/ArduinoMonitor/SensorMonitor.h"
+#include "src/SubModules/ArduinoMonitor/Logger.h"
 
+//DEBUG Library: For debug testing and performance testing
+#include "src/Testing/DebugAndPerformanceTest.h"
+
+// Constants
 #define SONAR1_trig 12
 #define SONAR1_echo 11
 #define LIMITSWITCH1 8
 
-NewPing sonar(SONAR1_trig, SONAR1_echo);
-
-//DEBUG PLEASE REMOVE Dummy variables for debugging
-unsigned dummyData = 0;
-bool dummyDataDirection = true;
-
-String incoming = "";
-String outgoing = "";
+// Globals
+NewPing sonar(SONAR1_trig, SONAR1_echo, 150);
+String incoming;
+Logger logger(500);
+// Set the JSON stream to output onto Serial
+JsonSerialStream outgoing = JsonSerialStream(Serial);
 
 void setup() 
 {
   Serial.begin(115200);
-  Serial.setTimeout(2);
+  
+  // Please be aware that the Uno ONLY has 2KB of RAM
+  // Reserve a small size that I am confident we will not exceed
+  incoming.reserve(50);
+  incoming = "";
 
   pinMode(LIMITSWITCH1, INPUT_PULLUP);
 }
 
 void loop() 
 {
-  if (dummyData <= 0)
-  {
-    // Start going up
-    dummyDataDirection = true;
-  }
-  else if (dummyData >= 60000)
-  {
-    // Start going down
-    dummyDataDirection = false;
-  }
-
-  if (dummyDataDirection)
-    dummyData++;
-  else
-    dummyData--;
-}
-
-// Generic data extractions and unit for each category of sensor
-String getSonarData(String name, NewPing sonarSensor)
-{
-  String output = name+",num,";
-  double medianTime = sonarSensor.ping_median(3);
-  output = output + sonarSensor.convert_cm(medianTime) + ",cm;";
-  return output;
-}
-
-String getLimitSwitchData(String name, int switchPin)
-{
-  String output = name+",bool,";
-  output = output + digitalRead(switchPin) + ",bool;";
-  return output;
-}
-
-// Aggregate data into message to be sent to Pi
-String getSensorData()
-{
-  // Sequence number
-  String output = "seq,"+String(millis()%2000)+";";
-
-  // sensor data: <sensorName>,<dataType>,<data>,<units>
-  // Sensor data is composed of comma ',' separated attributes
-  
-  // message data: <sensorData>;<sensorData>;\n
-  // Messages are composed of semicolon ';' separated sensor readings and end with newline '\n'
-  
-  //Sonar sensors:
-  // sonar
-  output = output + getSonarData("sonar1",sonar);
-
-  //Limit switch sensors:
-  // LIMITSWITCH1
-  output = output + getLimitSwitchData("limitSwitch1", LIMITSWITCH1);
-
-  //DEBUG PLEASE REMOVE
-  output = output + "dummyData,num,"+dummyData+",dummy;";
-
-  //DEBUG PLEASE REMOVE
-  if (dummyData%50 == 0)
-  {
-    output = output + "Dumb Chance,str, : "+dummyData+",str;";
-  }
-  output = output + "tick,str,.,str;";
-
-  return output;
+  //DEBUG Call to any code needed for testing
+  testCode();
 }
 
 // Serial input parser
 void serialEvent()
 {
-  // recieve input
+  // Recieve data byte by byte
   while (Serial.available())
   {
-    String readString = Serial.readString();
+    char readString = Serial.read();
     incoming += readString;
   }
-  incoming.trim();
 
-  // command interpreters
-  outgoing = cmdGetSensorData(incoming);
-
-  // reply if desired
-  if (outgoing != "")
+  // Interpret command once command ends
+  // Only one command allowed at a time
+  if (incoming.charAt(incoming.length()-1) == '\n')
   {
-    Serial.println(outgoing);
-    outgoing = "";
+    // Make commands uniform, ignore casing and leading/trailling whitespace
+    incoming.trim();
+    incoming.toLowerCase();
+
+    // Once the message is opened, it must be closed
+    outgoing.openMessage();
+
+    // Command interpreters
+    cmdGetSensors(incoming, outgoing);
+
+    //DEBUG Calls to debugging Functions
+    getTimingData(outgoing);
+    //getMemoryData(outgoing);
+    //getTestData(outgoing);
+
+    outgoing.closeMessage();
+    incoming = "";
   }
-  incoming = "";
 }
 
-String cmdGetSensorData(String command)
+bool cmdGetSensors(String command, JsonSerialStream &outgoing)
 {
   if (command.compareTo("get sensors") == 0)
   {
-    return getSensorData();
+    getSensorData(outgoing);
+    return true;
   }
-  return "";
+  return false;
+}
+
+// Specify what data to send through Serial
+void getSensorData(JsonSerialStream &outgoing)
+{
+  // Add semi-random acknowledgement value that will be used as a unique 
+  //  ID for each message
+  outgoing.addProperty("ack",(int)millis());
+
+  // This follows the JSON format
+  // Note that only numeric data has units, other sensors can be simple objects
+  // numeric data: "sensorName":{"data":<data>,"units":<units>}
+  // Simple data: "sensorName":<data>
+  // message data: {"ack":<millis>,"sensorName":{sensorData},"sensorName":<sensorData>}\n
+  
+  //Sonar sensors:
+  // Since sonar data has multiple properties: data, units. It is a nested 
+  //  json object with internal properies to it. 
+  // It is important that the nested object is closed
+  // sonar
+  outgoing.addNestedObject("sonar1");
+  getSonarObject(sonar, outgoing);
+  outgoing.closeNestedObject();
+
+  //Limit switch sensors:
+  // Since switchdata has only one property it does not need to be nested
+  // LIMITSWITCH1
+  outgoing.addProperty("limitSwitch1", getLimitSwitchData(LIMITSWITCH1));
+
+  //Log data
+  // Since we do not know what logs to add, it will handle adding them
+  logger.getLogs(outgoing);
 }

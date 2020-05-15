@@ -1,0 +1,96 @@
+{% extends "root.html" %}
+
+<!-- These blocks will replace the block positions found in root.html
+The Jinja2 syntax executed before being sent to the client -->
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+  <!-- Add a row so the Numeric and Boolean displays are side by side -->
+  <div class="row">
+    <!-- Have the Numeric display on the left, take up half the width -->
+    <div class="col-sm-6">
+      <div class="card">
+        <div class="card-header">
+          <label class="mb-0" for="int_display">Numeric</label>
+        </div>
+        <div class="card-body">
+          <!-- integer display -->
+          <textarea id="int_display" class="form-control bg-dark text-white border-white" disabled
+                    rows="10"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Have the Boolean display on the right, take up half the width  -->
+    <div class="col-sm-6 mt-4 mt-sm-0">
+      <div class="card">
+        <div class="card-header">
+          <label class="mb-0" for="bool_display">Boolean</label>
+        </div>
+        <div class="card-body">
+          <!-- boolean display -->
+          <textarea id="bool_display" class="form-control bg-dark text-white border-white" disabled
+                    rows="10"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add the Stream display below the row -->
+  <div class="card mt-4">
+    <div class="card-header">
+      <!-- Give an unordered list where Stream's buttons will be added dynamically -->
+      <ul class="nav nav-pills card-header-pills" id="logNavBar">
+      </ul>
+    </div>
+    <div class="card-body mt-0">
+      <!-- Stream display -->
+      <textarea id="out_display" class="form-control bg-dark text-white border-white" disabled
+                rows="15"></textarea>
+
+      <!-- console toolbar -->
+      <div class="btn-toolbar" role="toolbar">
+        <!-- auto scroll button -->
+        <div class="col-auto ml-auto px-0">
+          <button id="in_autoScroll" type="button" data-toggle="button" class="btn btn-outline-primary active">
+            Auto Scroll
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <!-- Import the main JavaScript file -->
+  <script src="{{ url_for('static', filename='JavaScript/index.js') }}"></script>
+  
+  <!-- Embedded JavaScript that is run on page load -->
+  <script>
+    // select page objects
+    const $outDisplay = $('#out_display');
+    const $inAutoScroll = $('#in_autoScroll');
+    const $boolDisplay = $('#bool_display');
+    const $intDisplay = $('#int_display');
+    const $heart = $('#heart');
+
+    // Initialize global data
+    var logStreams = {'currentStream':''};
+    var ackId = 0;
+    var watchDogTimer = 0;
+
+    // connect to Pi to get data maessages
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', "{{ url_for('console_stream') }}");
+    xhr.send();
+    let position = 0;
+
+    // Set routine call of update every XX milliseconds
+    setInterval(function () {
+      // update the displays
+      update();
+    }, 150);
+  </script>
+{% endblock %}

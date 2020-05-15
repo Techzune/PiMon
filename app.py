@@ -7,7 +7,7 @@ from flask import Flask, render_template, Response, send_from_directory
 from flask_assets import Environment, Bundle
 
 # import function to start reading/writing from serial port
-from serialHandler import setupSerialHandlers
+import arduinoPoller
 
 red = redis.StrictRedis()
 
@@ -20,13 +20,13 @@ def create_app():
     app = Flask(__name__)
 
     # render SCSS
-    scss = Bundle('site.scss', 'heartbeat.css', filters='libsass', output='site.css')
+    scss = Bundle('site.scss', filters='libsass', output='site.css')
     assets = Environment(app)
     assets.url = app.static_url_path
     assets.register('scss_all', scss)
 
-    # initialize serialHandlers
-    setupSerialHandlers()
+    # Spin up polling thread
+    arduinoPoller.setupArduinoPolling(0.333)
 
     # route to favicon
     @app.route('/favicon.ico')
@@ -36,24 +36,25 @@ def create_app():
     @app.route('/')
     def home():
         """Page: home of site"""
-        return render_template('index.jinja2')
+        return render_template('index.html')
 
     @app.route("/stream/console")
     def console_stream():
         """Stream: continuous pipeline stream
         This stream is connected to by client via Javascript to constantly download messages (Responses) from the server.
-        See ./templates/index.jinja2 for Javascript code.
+        See ./templates/index.html for Javascript code.
 
         """
 
         def events():
             while True:
                 yield red.get('msg')
+                arduinoPoller.keepPollAlive()
                 time.sleep(.1)
 
         return Response(events(), mimetype='text/plain')
 
-    return app
+    return app 
 
 
 if __name__ == '__main__':
